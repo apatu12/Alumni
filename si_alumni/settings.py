@@ -37,6 +37,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
+    "crispy_forms",
+    "crispy_bootstrap4",
+    'import_export',
+    'rest_framework',
+    'django_cleanup',
+    'django_social_share',
+    'alumni.app.AlumniConfig',
+    'custom.app.CustomConfig',
+    'main.app.MainConfig',
+    'notif.app.NotifConfig',
+    'report.app.ReportConfig',
+    'user.app.UserConfig'
 ]
 
 MIDDLEWARE = [
@@ -115,7 +128,45 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = 'static/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+CRISPY_TEMPLATE_PACK = "bootstrap4"
+
+ABSOLUTE_URL_OVERRIDES = {
+    'auth/user': lambda u : "/user/user"
+}
+
+LOGIN_REDIRECT_URL = 'index'
+LOGIN_URL = 'login'
+
+from django.contrib.messages import constants as message_constants 
+MESSAGE_TAGS = {
+    message_constants.DEBUG : 'debug',
+    message_constants.INFO: 'info',
+    message_constants.SUCCESS: 'success',
+    message_constants.ERROR: 'danger'
+}
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 60 * 60
+SESSION_SAVE_EVERY_REQUEST = True  
+
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
