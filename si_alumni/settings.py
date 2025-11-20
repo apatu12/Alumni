@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -44,12 +44,13 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_cleanup',
     'django_social_share',
-    'alumni.app.AlumniConfig',
-    'custom.app.CustomConfig',
-    'main.app.MainConfig',
-    'notif.app.NotifConfig',
-    'report.app.ReportConfig',
-    'user.app.UserConfig'
+    'alumni.apps.AlumniConfig',
+    'custom.apps.CustomConfig',
+    'main.apps.MainConfig',
+    'notif.apps.NotifConfig',
+    'report.apps.ReportConfig',
+    'user.apps.UserConfig',
+    'website.apps.WebsiteConfig'
 ]
 
 MIDDLEWARE = [
@@ -60,6 +61,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'si_alumni.urls'
