@@ -3,95 +3,251 @@ from config.utils import alumni_photo
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
 from django.utils import timezone
-from custom.models import Faculdade, Departamento, Municipality, AdministrativePost, Village, SubVillage, Nasaun, Year
-
+import uuid
+from custom.models import Faculdade, Departamento, Municipality, \
+     AdministrativePost, Village, SubVillage, Nasaun, Year, nivelmaster
+from simple_history.models import HistoricalRecords
 # Create your models here.
-class BaseModel(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_created")
-    updated_at = models.DateTimeField(auto_now=True)
-    updated_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_updated")
+class ActiveManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted_at__isnull=True)
+
+
+class Alumni(models.Model):
+    registration_no = models.CharField(max_length=50, verbose_name="Nu Registo do Antigo Aluno/NRE", unique=True, db_index=True)
+    name = models.CharField(max_length=120, verbose_name="Nome Completo")
+    sex = models.CharField(max_length=10, choices=[('Masculino', 'Masculino'), ('Femenino', 'Femenino')], verbose_name="Sexo")
+    dob= models.DateField(null=True, blank=True, verbose_name="Data de Nascimento")
+    pob = models.CharField(max_length=120, null=True, blank=True, verbose_name="Naturalidade")
+    father_name = models.CharField(max_length=120, null=True, blank=True, verbose_name='Nome Do Pai')
+    mother_name = models.CharField(max_length=120, null=True, blank=True, verbose_name='Nome Da Mãe')
+    email = models.EmailField(max_length=150, null=True, blank=True, verbose_name='E-Mail')
+    phone_number = models.CharField(max_length=20, null=True, blank=True, verbose_name='Nu Telemovel')
+    photo = models.ImageField(upload_to=alumni_photo, verbose_name='Imagen', validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif'])], null=True, blank=True) 
+    is_active = models.BooleanField(default=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="alumnicreatedbys")
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="alumniupdatetedbys")
+    updated_at = models.DateTimeField(null=True, blank=True)
+    deleted_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="alumnideletedbys")
     deleted_at = models.DateTimeField(null=True, blank=True)
-    deleted_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name="%(class)s_deleted")
+    hashed = models.CharField(max_length=32, null=True, blank=True)
+    history = HistoricalRecords()
+    def __str__(self):
+        nk = self.registration_no + " " + self.name
+        return nk
+    
+    def soft_delete(self, user):
+        self.deleted_at = timezone.now()
+        self.deleted_by = user
+        self.save()
+
+    def undelete(self):
+        self.deleted_at = None
+        self.deleted_by = None
+        self.save()
+
+    def hard_delete(self):
+        super().delete()
+
+    objects = models.Manager()  
+    active_objects = ActiveManager()
 
     class Meta:
-        abstract = True
+        verbose_name_plural='01-Dadus_Alumni_Pessoal'
 
-
-class Alumni(BaseModel):
-    registration_no = models.CharField(max_length=50, unique=True, verbose_name="Registration Number")
-    full_name = models.CharField(max_length=120, verbose_name="Full Name")
-
-    sex = models.CharField(
-        max_length=10,
-        choices=[('M', 'Masculino'), ('F', 'Femenino')],
-        verbose_name="Gender"
-    )
-    date_of_birth = models.DateField(null=True, blank=True)
-    place_of_birth = models.CharField(max_length=120)
-    father_name = models.CharField(max_length=120, null=True, blank=True)
-    mother_name = models.CharField(max_length=120, null=True, blank=True)
-    email = models.EmailField(max_length=150, null=True, blank=True)
-    phone_number = models.CharField(max_length=20, null=True, blank=True)
-    photo = models.ImageField(upload_to="alumni/photos/", null=True, blank=True)
-    is_active = models.BooleanField(default=True)
-
-    def __str__(self):
-        return f"{self.full_name} ({self.registration_no})"
-
-class AlumniAddress(BaseModel):
+class AlumniAddress(models.Model):
     alumni = models.OneToOneField(Alumni, on_delete=models.CASCADE, related_name="address")
-    municipality = models.ForeignKey(Municipality, on_delete=models.SET_NULL, null=True)
-    administrative_post = models.ForeignKey(AdministrativePost, on_delete=models.SET_NULL, null=True)
-    suco = models.ForeignKey(Village, on_delete=models.SET_NULL, null=True)
-    aldeia = models.ForeignKey(SubVillage, on_delete=models.SET_NULL, null=True)
-    detail_address = models.CharField(max_length=255, null=True, blank=True)
+    mun = models.ForeignKey(Municipality, on_delete=models.CASCADE, null=True, verbose_name='Município')
+    post = models.ForeignKey(AdministrativePost, on_delete=models.CASCADE, null=True, verbose_name='Posto Administrativo')
+    suk = models.ForeignKey(Village, on_delete=models.CASCADE, null=True, verbose_name="Suco")
+    ald = models.ForeignKey(SubVillage, on_delete=models.CASCADE, null=True, verbose_name="Aldeia")
+    detail_address = models.CharField(max_length=255, null=True, blank=True, verbose_name="Detailho Endereso")
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="Addresscreatedbys")
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="Addressupdatetedbys")
+    updated_at = models.DateTimeField(null=True, blank=True)
+    deleted_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="Addressdeletedbys")
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    hashed = models.CharField(max_length=32, null=True, blank=True)
+    history = HistoricalRecords()
     def __str__(self):
-        return f"Address of {self.alumni.full_name}"
+        #template = '{0.name}'
+        nk = self.alumni.name + " " + self.municipality.name
+        return nk
+    
+    def soft_delete(self, user):
+        self.deleted_at = timezone.now()
+        self.deleted_by = user
+        self.save()
 
-class AcademicRecord(BaseModel):
+    def undelete(self):
+        self.deleted_at = None
+        self.deleted_by = None
+        self.save()
+
+    def hard_delete(self):
+        super().delete()
+
+    objects = models.Manager()  # The default manager
+    active_objects = ActiveManager()
+
+    class Meta:
+        verbose_name_plural='02-Dadus_Alumni_Enderesu'
+
+class AcademicRecord(models.Model):
     alumni = models.OneToOneField(Alumni, on_delete=models.CASCADE, related_name="academic")
-    faculty = models.ForeignKey(Faculdade, on_delete=models.SET_NULL, null=True)
-    department = models.ForeignKey(Departamento, on_delete=models.SET_NULL, null=True)
-    year_start = models.CharField(max_length=4, null=True, blank=True)
-    year_graduation = models.ForeignKey(Year, on_delete=models.SET_NULL, null=True, related_name="graduated_alumni")
-    thesis_title = models.CharField(max_length=255, null=True, blank=True)
-    advisor_1 = models.CharField(max_length=120, null=True, blank=True)
-    advisor_2 = models.CharField(max_length=120, null=True, blank=True)
-    gpa = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
-    predicate = models.CharField(max_length=50, null=True, blank=True)
-
+    faculty = models.ForeignKey(Faculdade, on_delete=models.CASCADE, null=True, verbose_name="Faculdade")
+    department = models.ForeignKey(Departamento, on_delete=models.CASCADE, null=True, verbose_name="Departamento")
+    year_start = models.CharField(max_length=4, null=True, blank=True, verbose_name="Ano Início")
+    year_graduation = models.ForeignKey(Year, on_delete=models.CASCADE, null=True, verbose_name="Ano Termina")
+    thesis_title = models.CharField(max_length=255, null=True, blank=True, verbose_name="Titulo De Teze")
+    advisor_1 = models.CharField(max_length=120, null=True, blank=True, verbose_name=" Oreintador I")
+    advisor_2 = models.CharField(max_length=120, null=True, blank=True, verbose_name=" Oreintador II")
+    gpa = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True, verbose_name="IPC")
+    predicate = models.CharField(max_length=50, null=True, blank=True, verbose_name="Predicado")
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="Academiccreatedbys")
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="Academicupdatetedbys")
+    updated_at = models.DateTimeField(null=True, blank=True)
+    deleted_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="Academicdeletedbys")
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    hashed = models.CharField(max_length=32, null=True, blank=True)
+    history = HistoricalRecords()
     def __str__(self):
-        return f"{self.alumni.full_name} - {self.department}"
+        #template = '{0.name}'
+        nk = self.alumni.name + " " + self.faculty.name
+        return nk
+    
+    def soft_delete(self, user):
+        self.deleted_at = timezone.now()
+        self.deleted_by = user
+        self.save()
 
-class Career(BaseModel):
+    def undelete(self):
+        self.deleted_at = None
+        self.deleted_by = None
+        self.save()
+
+    def hard_delete(self):
+        super().delete()
+
+    objects = models.Manager()  
+    active_objects = ActiveManager()
+
+    class Meta:
+        verbose_name_plural='03-Dadus_Alumni_Academica'
+
+class Career(models.Model):
     alumni = models.ForeignKey(Alumni, on_delete=models.CASCADE, related_name="careers")
     job_field = models.CharField(
         max_length=50,
-        choices=[('Relevant', 'Relevant'), ('Not Relevant', 'Not Relevant')]
-    )
-    institution = models.CharField(max_length=150, null=True, blank=True)
-    department = models.CharField(max_length=150, null=True, blank=True)
-    position = models.CharField(max_length=150, null=True, blank=True)
-    country = models.ForeignKey(Nasaun, on_delete=models.SET_NULL, null=True)
-
+        choices=[('Relevante', 'Relevante'), ('Não Relevante', 'Não Relevante')], verbose_name="Estado Servico")
+    institution = models.CharField(max_length=150, null=True, blank=True, verbose_name="instituticão")
+    department = models.CharField(max_length=150, null=True, blank=True, verbose_name="Departamento")
+    position = models.CharField(max_length=150, null=True, blank=True, verbose_name="Posicão")
+    country = models.ForeignKey(Nasaun, on_delete=models.CASCADE, null=True, verbose_name="País")
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="Careiracreatedbys")
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="Careiraupdatetedbys")
+    updated_at = models.DateTimeField(null=True, blank=True)
+    deleted_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="Careiradeletedbys")
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    hashed = models.CharField(max_length=32, null=True, blank=True)
+    history = HistoricalRecords()
     def __str__(self):
-        return f"{self.alumni.full_name} - {self.position}"
+        #template = '{0.name}'
+        nk = self.alumni.name + " " + self.job_field
+        return nk
+    
+    def soft_delete(self, user):
+        self.deleted_at = timezone.now()
+        self.deleted_by = user
+        self.save()
 
-class FurtherStudy(BaseModel):
+    def undelete(self):
+        self.deleted_at = None
+        self.deleted_by = None
+        self.save()
+
+    def hard_delete(self):
+        super().delete()
+
+    objects = models.Manager()  
+    active_objects = ActiveManager()
+
+    class Meta:
+        verbose_name_plural='04-Dadus_Alumni_Careira'
+
+class FurtherStudy(models.Model):
     alumni = models.ForeignKey(Alumni, on_delete=models.CASCADE, related_name="further_studies")
-    study_level = models.ForeignKey(nivelmaster, on_delete=models.SET_NULL, null=True)
-    major = models.CharField(max_length=255, null=True, blank=True)
-    university = models.CharField(max_length=255, null=True, blank=True)
-    country = models.ForeignKey(Nasaun, on_delete=models.SET_NULL, null=True)
-
+    study_level = models.ForeignKey(nivelmaster, on_delete=models.CASCADE, null=True, verbose_name="Nivel Estudo")
+    major = models.CharField(max_length=255, null=True, blank=True, verbose_name="Especialidade")
+    university = models.CharField(max_length=255, null=True, blank=True, verbose_name="Univesidade")
+    country = models.ForeignKey(Nasaun, on_delete=models.CASCADE, null=True, verbose_name="País")
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="estudocreatedbys")
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="estudoupdatetedbys")
+    updated_at = models.DateTimeField(null=True, blank=True)
+    deleted_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="estudodeletedbys")
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    hashed = models.CharField(max_length=32, null=True, blank=True)
+    history = HistoricalRecords()
     def __str__(self):
-        return f"{self.alumni.full_name} - {self.university}"
+        #template = '{0.name}'
+        nk = self.alumni.name + " " + self.study_level.name
+        return nk
+    
+    def soft_delete(self, user):
+        self.deleted_at = timezone.now()
+        self.deleted_by = user
+        self.save()
 
-class AlumniUser(BaseModel):
+    def undelete(self):
+        self.deleted_at = None
+        self.deleted_by = None
+        self.save()
+
+    def hard_delete(self):
+        super().delete()
+
+    objects = models.Manager() 
+    active_objects = ActiveManager()
+
+    class Meta:
+        verbose_name_plural='05-Dadus_Alumni_Estudo'
+
+class AlumniUser(models.Model):
     alumni = models.OneToOneField(Alumni, on_delete=models.CASCADE, related_name="account")
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="Alumnicreatedbys")
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="Alumniupdatetedbys")
+    updated_at = models.DateTimeField(null=True, blank=True)
+    deleted_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="Alumnideletedbys")
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    history = HistoricalRecords()
+    hashed = models.CharField(max_length=32, null=True, blank=True)
     def __str__(self):
-        return f"{self.alumni.full_name} - {self.user.username}"
+        #template = '{0.name}'
+        nk = self.alumni.name + " " + self.user
+        return nk
+    
+    def soft_delete(self, user):
+        self.deleted_at = timezone.now()
+        self.deleted_by = user
+        self.save()
+
+    def undelete(self):
+        self.deleted_at = None
+        self.deleted_by = None
+        self.save()
+
+    def hard_delete(self):
+        super().delete()
+
+    objects = models.Manager()  # The default manager
+    active_objects = ActiveManager()
+
+    class Meta:
+        verbose_name_plural='06-Dadus_Alumni_user'

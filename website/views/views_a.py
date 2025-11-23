@@ -5,4 +5,4 @@ def webhome(request):
     context = {
         'title': "Universidade Nacional Timor Lorosa'e (UNTL)",
     }
-    return render(request, 'website/layout.html', context)
+    return render(request, 'website/home.html', context)

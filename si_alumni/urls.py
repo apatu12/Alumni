@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls import handler404, handler500
+from main import views as main_views
 
 admin.site.site_title ='SI-ALUMNI-UNTL'
 admin.site.site_header ='SI-ALUMNI-UNTL'
@@ -25,6 +26,8 @@ admin.site.index_title ='SI-ALUMNI-UNTL'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('website.urls'), name='web-home'),
+    path('Admin-Home.html/', main_views.home, name='index'),
+    path('Login-Page.html/', main_views.loginPage, name='login'),
 ]
 handler404 = 'main.views.error_404'
 handler500 = 'main.views.error_500'

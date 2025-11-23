@@ -1,0 +1,19 @@
+{% extends 'Main/Admin/layout.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    {% if user.is_authenticated %}
+        {% if user.groups.all.0.name == 'Admin' %}
+            {% include 'Home/Admin/Admin.html' %}
+        {% elif user.groups.all.0.name == 'Vice_Reitor' %}
+             {% include 'Home/Admin/vice.html' %}
+        {% elif user.groups.all.0.name == 'Staff' %}
+            {% include 'Home/Admin/staff.html' %}
+        {% elif user.groups.all.0.name == 'Alumni' %}
+            {% include 'Home/Admin/alumni.html' %}
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
+

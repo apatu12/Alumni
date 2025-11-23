@@ -1,4 +1,5 @@
 {% load static %}
+{% load widget_tweaks %}
 {% load crispy_forms_tags %}
 <!DOCTYPE html>
 <html>
@@ -24,24 +25,47 @@
 
         <div class="card-body">
           <h4 class="title text-center mt-4">
-            Login
+            Entrada
               </h4>
-          <form action="" method="post" class="form-box px-3">
-            
-            {% csrf_token %}
-            {{form|crispy}}
-            <div class="mb-3">
-              <div class="custom-control custom-checkbox">
-                <input type="checkbox" class="custom-control-input" id="cb1" name="">
-                <label class="custom-control-label" for="cb1">Lembrar-me</label>
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <button type="submit" class="btn btn-block text-uppercase" style="background-color: #10c4c4;">
-                Login
-              </button>
-            </div>
+          <form action="{% url 'login' %}" method="post" class="form-box px-3">
+            {% csrf_token %}            
+                                        <div class="form-group my-4">
+                                          <label for="id_username" class="form-weight-blod"> Nome Utilisador:</label>
+                                            <div class="input-group">
+                                              <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fa fa-user"></i></span>
+                                              </div>
+                                              <input type="text" class="form-control form-control-user"
+                                                id="inputGroupPrepared" aria-describedby="username" name="username" 
+                                                placeholder="Prenche Nome Utilisador" required autofocus>
+                                                <div class="invalid-feedback">Por Favor Prence Nome Utilizador</div>
+                                            </div>
+                                        </div>
+                                         <div class="form-group my-4">
+                                          <label for="id_username" class="form-weight-blod"> Palavra Chave:</label>
+                                            <div class="input-group">
+                                              <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fa fa-lock"></i></span>
+                                              </div>
+                                              <input type="password" class="form-control form-control-user"
+                                                id="inputGroupPrepared" aria-describedby="password" name="password" 
+                                                placeholder="Prenche Palavra Chave" required autofocus>
+                                                <div class="invalid-feedback">Por Favor Prence Palavra Chave</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <div class="custom-control custom-checkbox small">
+                                                <input type="checkbox" class="custom-control-input" id="customCheck">
+                                                <label class="custom-control-label" for="customCheck">Remember
+                                                    Me</label>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center my-3">
+                                          <button class="btn btn-info btn-lock text-white font-weight-bold py-2" type="submit">
+                                            <i class="fa fa-sign-in"> </i> Entra
+                                          </button>
+                                        </div>
             <hr class="my-4">
 
             <div class="text-center mb-2">

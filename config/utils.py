@@ -3,11 +3,11 @@ from uuid import uuid4
 from django.db import models
 
 def alumni_photo(instance, filename):
-    upload_to = 'Alumni_data/{}'.format(instance.nre)
+    upload_to = 'Alumni_data/{}'.format(instance.registration_no)
     field = 'Foto'
     ext = filename.split('.')[-1]
     if instance.pk:
-        filename = '{}_{}.{}'.format(field, instance.nre, ext)
+        filename = '{}_{}.{}'.format(field, instance.registration_no, ext)
     else:
         filename = '{}.{}'.format(uuid4().hex, ext)
     return os.path.join(upload_to, filename)
