@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erro do Servidor - 500</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #ffe5e5;
+            text-align: center;
+            color: #721c24;
+        }
+        .container {
+            max-width: 600px;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 6rem;
+            color: #dc3545;
+        }
+        p {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+        a.btn {
+            color: #fff;
+            background-color: #dc3545;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        a.btn:hover {
+            background-color: #a71d2a;
+        }
+        @media(max-width: 600px) {
+            h1 { font-size: 4rem; }
+            p { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>500</h1>
+        <p>Erro interno do servidor! Favor tentar novamente mais tarde.</p>
+        <a class="btn" href="{% url 'home' %}">Voltar para a página inicial</a>
+    </div>
+</body>
+</html>
