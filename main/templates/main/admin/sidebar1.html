@@ -1,0 +1,75 @@
+<div class="card rounded" style="border-color: #10c4c4">
+  <ul class="list-group">
+    <li class="list-group-item">
+      <a href="{% url 'index' %}"> <i class="fa fa-home"></i> Início </a>
+    </li>
+    <!-- DROPDOWN 1 -->
+    <li class="list-group-item">
+      <a href="">
+        <i class="fa fa-user-graduate"></i> Alumni
+      </a>
+    </li>
+       <li class="list-group-item">
+      <a href="#submenu3" data-toggle="collapse">
+        <i class="fas fa-list"></i> Relatorio
+        <i class="fa fa-caret-down float-right"></i>
+      </a>
+      <ul class="collapse list-group mt-2" id="submenu3">
+        <li class="list-group-item">
+          <a href="#"><i class="fa fa-chart-bar"></i> Grafico</a>
+        </li>
+        <li class="list-group-item">
+          <a href="#"><i class="fa fa-table"></i> Tabular</a>
+        </li>
+      </ul>
+    </li>
+    <li class="list-group-item">
+      <a href="#submenu1" data-toggle="collapse">
+        <i class="fas fa-cog"></i> Configurações
+        <i class="fa fa-caret-down float-right"></i>
+      </a>
+      <ul class="collapse list-group mt-2" id="submenu1">
+        <li class="list-group-item">
+          <a href="#"><i class="fa fa-list"></i> Lista Utilizadores</a>
+        </li>
+        <li class="list-group-item">
+          <a href="#"><i class="fa fa-list"></i> Lista Munsipiu</a>
+        </li>
+        <li class="list-group-item">
+          <a href="#"><i class="fa fa-list"></i> Lista Postu</a>
+        </li>
+        <li class="list-group-item">
+          <a href="#"><i class="fa fa-list"></i> Lista Suco</a>
+        </li>
+        <li class="list-group-item">
+          <a href="#"><i class="fa fa-list"></i> Lista Aldeia</a>
+        </li>
+        <li class="list-group-item">
+          <a href="#"><i class="fa fa-list"></i> Slider</a>
+        </li>
+        <li class="list-group-item">
+          <a href="#"><i class="fa fa-list"></i> Informações</a>
+        </li>
+      </ul>
+    </li>
+ 
+    <!-- DROPDOWN 2 -->
+    <li class="list-group-item">
+      <a href="#submenu2" data-toggle="collapse">
+        <i class="fas fa-user"></i> {{ request.user.username|upper}}({{request.user.groups.first}})
+        <i class="fa fa-caret-down float-right"></i>
+      </a>
+      <ul class="collapse list-group mt-2" id="submenu2">
+        <li class="list-group-item">
+          <a href="#">Perfil</a>
+        </li>
+        <li class="list-group-item">
+          <a href="#">Configurações</a>
+        </li>
+        <li class="list-group-item">
+          <a href="{% url 'logout' %}">Sai</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>

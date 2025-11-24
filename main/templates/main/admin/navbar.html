@@ -1,6 +1,4 @@
-{% load static %} 
-{% if user.is_authenticated %} 
-{% if user.groups.all.0.name == 'Admin' or user.groups.all.0.name == 'Vice_Reitor' %}
+{% load static %}
 <nav
   class="navbar navbar-dark navbar-expand-md shadow fixed-top"
   style="background: #41d5f0"
@@ -30,7 +28,10 @@
     </button>
     <div class="collapse navbar-collapse" id="navcol-1">
       <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
+        {% if user.is_authenticated %}
+          {% if user.groups.all.0.name == 'Admin'  %}
+          {% elif  user.groups.all.0.name == 'Vice_Reitor' %}
+                  <li class="nav-item">
           <a class="nav-link text-white" href="{% url 'index' %}">
             <i class="fa fa-home"></i> Início
           </a>
@@ -61,64 +62,40 @@
             </a>
           </div>
         </li>
-        <li class="nav-item dropdown active">
+          {% elif user.groups.all.0.name == 'Staff' %}
+                  <li class="nav-item">
+          <a class="nav-link text-white" href="{% url 'index' %}">
+            <i class="fa fa-home"></i> Início
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="">
+            <i class="fa fa-graduation-cap"></i> Antigos Alunos
+          </a>
+        </li>
+
+        <li class="nav-item dropdown">
           <a
-            class="nav-link dropdown-toggle"
-            href="#"
-            id="profile"
+            class="nav-link dropdown-toggle text-white"
             data-toggle="dropdown"
+            href="#"
+            role="button"
             aria-haspopup="true"
             aria-expanded="false"
-            >{{ request.user.username|upper}}</a
           >
-          <div class="dropdown-menu" aria-labelledby="profile">
-            <a class="dropdown-item" href=""
-              ><i class="fa fa-user"></i> Perfil</a
-            >
-            <a class="dropdown-item" href=""
-              ><i class="fa fa-users"></i> Minha Conta</a
-            >
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href=""
-              ><i class="fa fa-sign-out-alt"></i> Sair</a
-            >
+            <i class="fa fa-list"></i> Dados
+          </a>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="">
+              <i class="fa fa-cube"></i> Faculdade
+            </a>
+            <a class="dropdown-item" href="">
+              <i class="fa fa-boxes fa-xs"></i> Departamento
+            </a>
           </div>
         </li>
-      </ul>
-    </div>
-  </div>
-</nav>
-{% elif user.groups.all.0.name == 'Alumni' %}
-<nav
-  class="navbar navbar-dark navbar-expand-md shadow fixed-top"
-  style="background: #41d5f0"
->
-  <div class="container">
-    <a class="navbar-brand d-flex align-items-center" href="#">
-      <img
-        src="{% static 'image/UNTL.png' %}"
-        alt="PNTL"
-        class="brand-image img-circle elevation-3"
-        style="opacity: 0.8; height: 40px"
-      />
-      <span class="ml-2"
-        ><b><strong>SI-AN-UNTL</strong></b></span
-      >
-    </a>
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-toggle="collapse"
-      data-target="#navcol-1"
-      aria-controls="navcol-1"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navcol-1">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
+          {% elif user.groups.all.0.name == 'Alumni' %}
+           <li class="nav-item">
           <a class="nav-link text-white" href="{% url 'index' %}">
             <i class="fa fa-home"></i> Início
           </a>
@@ -128,7 +105,9 @@
             <i class="fa fa-users"></i> Dados Pessoal
           </a>
         </li>
-        <li class="nav-item dropdown active">
+          {% else %}
+          {% endif %}
+                  <li class="nav-item dropdown active">
           <a
             class="nav-link dropdown-toggle"
             href="#"
@@ -136,13 +115,13 @@
             data-toggle="dropdown"
             aria-haspopup="true"
             aria-expanded="false"
-            >{{ request.user.username|upper}}</a
+            >{{ request.user.username|upper}}({{request.user.groups.first}})</a
           >
           <div class="dropdown-menu" aria-labelledby="profile">
-            <a class="dropdown-item" href="{% url 'Perfil' %}"
+            <a class="dropdown-item" href=""
               ><i class="fa fa-user"></i> Perfil</a
             >
-            <a class="dropdown-item" href="{% url 'user-account' %}"
+            <a class="dropdown-item" href=" "
               ><i class="fa fa-users"></i> Minha Conta</a
             >
             <div class="dropdown-divider"></div>
@@ -151,10 +130,9 @@
             >
           </div>
         </li>
+        {% endif %}
       </ul>
     </div>
   </div>
 </nav>
-{%else%} 
-{% endif %}
-{% endif %}
+

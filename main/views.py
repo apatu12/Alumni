@@ -14,6 +14,7 @@ from django.urls import resolve
 from config.decorators import allowed_users
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 
 @login_required
 def home(request):
@@ -62,6 +63,11 @@ def loginPage(request):
     }
     return render(request, 'auth/login.html', context)
 
+
+def logout_view(request):
+    logout(request)          
+    request.session.flush()  
+    return render(request, 'auth/logout.html')
 
 def error_404(request, exception):
         data = {}

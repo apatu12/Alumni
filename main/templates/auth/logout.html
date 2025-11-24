@@ -1,0 +1,29 @@
+{% load static %}
+{% load widget_tweaks %}
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+           {% if title %}
+        <title>SI-ALUMNI-UNTL-{{ title }}</title>
+        {% else %}
+        <title>SI-ALUMNI-UNTL-TIMOR-LESTE</title>
+        {% endif %}
+    <link rel="shorcut icon" href="{% static 'image/UNTL.png' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'main/loginstyle/style.css'%}">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+</head>
+<body class="bg-light d-flex justify-content-center align-items-center" style="height: 100vh;">
+
+    <div class="text-center p-5 bg-white rounded shadow-sm">
+        <h1 class="text-danger mb-4">Voce Ja Sair</h1>
+        <hr>
+        <p class="text-muted mb-4">Obrigado por já ter usado este sistema</p>
+        <a href="{% url 'login' %}" class="btn btn-outline-info"><i class="fa fa-arrow-circle-right"></i> Voltar para o Login</a>
+    </div>
+</body>
+</html>

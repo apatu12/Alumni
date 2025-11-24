@@ -28,6 +28,7 @@ urlpatterns = [
     path('', include('website.urls'), name='web-home'),
     path('Admin-Home.html/', main_views.home, name='index'),
     path('Login-Page.html/', main_views.loginPage, name='login'),
+    path('logout-Page.html/', main_views.logout_view, name='logout'),
 ]
 handler404 = 'main.views.error_404'
 handler500 = 'main.views.error_500'

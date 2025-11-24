@@ -29,6 +29,11 @@
               </h4>
           <form action="{% url 'login' %}" method="post" class="form-box px-3">
             {% csrf_token %}            
+            {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} py-2">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
                                         <div class="form-group my-4">
                                           <label for="id_username" class="form-weight-blod"> Nome Utilisador:</label>
                                             <div class="input-group">
