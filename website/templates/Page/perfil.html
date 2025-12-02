@@ -1,0 +1,111 @@
+{% extends "website/layout.html" %}
+{% load static %}
+{% block content %}
+
+<!-- HERO SECTION -->
+<div class="hero shadow-sm mb-4" 
+     style="background-image: url('{% static "image/untl_campus.jpg" %}');
+            background-size: cover;
+            background-position: center;
+            border-radius: 10px;">
+  <div class="p-5 text-white" style="background: rgba(0,0,0,0.55); border-radius: 10px;">
+    <h1 class="fw-bold text-center mb-2">{{ legend|upper }}</h1>
+    <p class="text-center fs-5">
+      Conheça a história, missão e evolução da Universidade Nacional Timor Lorosa’e (UNTL)
+    </p>
+  </div>
+</div>
+
+<!-- BREADCRUMB -->
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Início</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ legend|upper }}</li>
+  </ol>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="card shadow-sm rounded border-0 p-4 mb-5">
+  <div class="row align-items-center">
+    <!-- Logo -->
+    <div class="col-md-4 text-center mb-3">
+      <img src="{% static 'image/UNTL.png' %}" 
+           class="img-fluid rounded" 
+           style="max-height: 200px;" 
+           alt="Logo UNTL" />
+    </div>
+
+    <!-- Text -->
+    <div class="col-md-8">
+      <h2 class="text-primary text-center mb-3">
+        <strong>Estatuto da Universidade Nacional de Timor Lorosa’e</strong>
+      </h2>
+      <p class="text-justify">
+        A <strong>Universidade Nacional Timor Lorosa’e (UNTL)</strong> foi criada em 2000,
+        por iniciativa dos ex-docentes das instituições de ensino superior da época,
+        com apoio da UNTAET, marcando o início de uma nova era no ensino superior
+        em Timor-Leste.
+      </p>
+
+      <p class="text-justify">
+        A Lei Orgânica do Ministério da Educação de 2008 reafirmou a UNTL como
+        instituição pública universitária com autonomia administrativa, científica
+        e pedagógica, reforçando o seu papel no desenvolvimento nacional.
+      </p>
+
+      <p class="text-justify">
+        O Estatuto da UNTL foi elaborado através de várias reuniões entre o
+        Ministério da Educação e os órgãos da Universidade, garantindo que o
+        documento refletisse as necessidades académicas e o futuro da instituição.
+      </p>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- HIGHLIGHT ICON BOXES -->
+  <div class="row text-center mb-4">
+    <div class="col-md-4 mb-3">
+      <div class="p-3 border rounded shadow-sm h-100">
+        <img src="{% static 'icons/history.png' %}" 
+             width="60" class="mb-2">
+        <h5 class="fw-bold">História</h5>
+        <p>Fundada em 2000, marco importante na educação de Timor-Leste.</p>
+      </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+      <div class="p-3 border rounded shadow-sm h-100">
+        <img src="{% static 'icons/mission.png' %}" 
+             width="60" class="mb-2">
+        <h5 class="fw-bold">Missão</h5>
+        <p>Formar recursos humanos qualificados para o desenvolvimento nacional.</p>
+      </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+      <div class="p-3 border rounded shadow-sm h-100">
+        <img src="{% static 'icons/law.png' %}" 
+             width="60" class="mb-2">
+        <h5 class="fw-bold">Base Legal</h5>
+        <p>Estatuto aprovado pelo Conselho de Ministros e promulgado em lei.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- IMAGE GALLERY -->
+  <h4 class="fw-bold text-primary mt-4 mb-3">Galeria da UNTL</h4>
+  <div class="row g-3">
+    <div class="col-md-4">
+      <img src="{% static 'image/campus1.jpg' %}" class="img-fluid rounded shadow-sm">
+    </div>
+    <div class="col-md-4">
+      <img src="{% static 'image/campus2.jpg' %}" class="img-fluid rounded shadow-sm">
+    </div>
+    <div class="col-md-4">
+      <img src="{% static 'image/campus3.jpg' %}" class="img-fluid rounded shadow-sm">
+    </div>
+  </div>
+
+</div>
+{% endblock %}

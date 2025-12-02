@@ -48,7 +48,7 @@ def antigosalunos_create(request):
         'title': 'Registo Antigos Alunos',
         'legend': 'Registo Dados Pesoal Antigos Alunos'
     }
-    return render(request, 'alunos_reg/form.html', context)
+    return render(request, 'alunos_reg/form12.html', context)
 
 def aluno_address(request, hashed):
     try:
@@ -74,7 +74,7 @@ def aluno_address(request, hashed):
         'title': 'Registo Naturalidade',
         'legend': 'Registo Naturalidade',
     }
-    return render(request, 'alunos_reg/form.html', context)
+    return render(request, 'alunos_reg/form12.html', context)
 
 
 
@@ -101,7 +101,7 @@ def aluno_estudo(request, hashed):
         'title': 'Registo Estudo Académico',
         'legend': 'Registo Estudo Académico',
     }
-    return render(request, 'alunos_reg/form.html', context)
+    return render(request, 'alunos_reg/form12.html', context)
 
 
 def aluno_status(request, hashed):
@@ -120,7 +120,7 @@ def aluno_status(request, hashed):
         'title': 'Registo Status Atual',
         'legend': 'Registo Status Atual'
     }
-    return render(request, "alunos_reg/form.html", context)
+    return render(request, "alunos_reg/form12.html", context)
 
 
 
@@ -147,7 +147,7 @@ def aluno_carrer(request, hashed):
         'title': 'Registo Estudo Académico',
         'legend': 'Registo Estudo Académico',
     }
-    return render(request, 'alunos_reg/form.html', context)
+    return render(request, 'alunos_reg/form12.html', context)
 
 def aluno_further(request, hashed):
     try:
@@ -172,7 +172,7 @@ def aluno_further(request, hashed):
         'title': 'Estudo Continua',
         'legend': 'Estudo Continua',
     }
-    return render(request, 'alunos_reg/form.html', context)
+    return render(request, 'alunos_reg/form12.html', context)
 
 def alumni_verify(request, hashed):
     try:
@@ -263,4 +263,4 @@ def aluno_status(request, hashed):
     else:
         form = AlumniStatusForm(instance=aluno)
 
-    return render(request, "alunos_reg/form.html", {"form": form})
+    return render(request, "alunos_reg/form12.html", {"form": form})

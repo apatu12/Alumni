@@ -45,3 +45,12 @@ def webhome(request):
         'title': "Universidade Nacional Timor Lorosa'e (UNTL)",
     }
     return render(request, 'website/home.html', context)
+
+
+
+def perfil(request):
+    context={
+        'title': 'Estatuto Da UNTL',
+        'legend': 'Estatuto Da UNTL',
+    }
+    return render(request, 'Page/perfil.html', context)

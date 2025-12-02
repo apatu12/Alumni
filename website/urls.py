@@ -12,4 +12,7 @@ urlpatterns = [
     path("ajax/pos-form/", views.ajax_pos_form, name="ajax-pos-form"),
 	path('verify/<str:hashed>/', views.alumni_verify, name='alumni_verify'),
 
+
+	path('Perfil-Page.html/', views.perfil, name='al-perf'),
+
 ]

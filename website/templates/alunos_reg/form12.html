@@ -1,0 +1,195 @@
+{% load static %}
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>
+        {% if title %} SI-ALUMNI-UNTL – {{ title }} {% else %} SI-ALUMNI-UNTL-TIMOR-LESTE {% endif %}
+    </title>
+
+    <link rel="shortcut icon" href="{% static 'image/UNTL1.png' %}" />
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Lora:400,700" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static 'theme/css/font-awesome.min.css' %}">
+
+    <style>
+        body {
+            font-family: "Lora", serif;
+            background: #f4f7fa;
+        }
+
+        .card {
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-header {
+            padding: 15px 20px;
+        }
+
+        .breadcrumb {
+            background: white;
+            border-radius: 10px;
+            padding: 10px 20px;
+        }
+
+        /* ========== BLOCK VIEW SOURCE + COPY + DRAG ========== */
+        body {
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            user-select: none;
+        }
+
+        img {
+            -webkit-user-drag: none;
+            user-drag: none;
+        }
+    </style>
+
+    <script>
+        // ========== BLOCK KLIK KANAN ==========
+        document.addEventListener("contextmenu", function (e) {
+            e.preventDefault();
+        });
+
+        // ========== BLOCK CTRL+U, CTRL+C, CTRL+SHIFT+I, F12 ==========
+        document.onkeydown = function (e) {
+            // F12
+            if (e.keyCode === 123) return false;
+
+            // CTRL+SHIFT+I
+            if (e.ctrlKey && e.shiftKey && e.keyCode === 73) return false;
+
+            // CTRL+U
+            if (e.ctrlKey && e.keyCode === 85) return false;
+
+            // CTRL+C / CTRL+X / CTRL+S
+            if (e.ctrlKey && (e.keyCode === 67 || e.keyCode === 83 || e.keyCode === 88)) return false;
+        };
+    </script>
+
+</head>
+
+<body>
+
+    <div class="container mt-4 mb-5">
+
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+                <li class="breadcrumb-item active">{{ title|upper }}</li>
+            </ol>
+        </nav>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <div class="card">
+            <div class="card-header text-white" style="background:#41d5f0;">
+                <h5 class="mb-0 font-weight-bold">
+                    <i class="fa fa-list"></i> {{ legend|upper }}
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <form method="post" id="AlmuniForm" enctype="multipart/form-data"
+                    data-postu-url="{% url 'ajax-load-postu' %}"
+                    data-suku-url="{% url 'ajax-load-suku' %}"
+                    data-aldeia-url="{% url 'ajax-load-aldeia' %}"
+                    data-departamento-url="{% url 'ajax-load-dep' %}" novalidate>
+
+                    {% csrf_token %}
+                    {% crispy form %}
+                </form>
+
+                <!-- jQuery -->
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+                <!-- JS Ajax -->
+                <script>
+                    $(document).ready(function () {
+
+                        function ajaxLoad(idSelector, url, paramName) {
+                            $(idSelector).change(function () {
+                                var value = $(this).val();
+                                $.ajax({
+                                    url: url,
+                                    data: { [paramName]: value },
+                                    success: function (data) {
+                                        let target = "#id_" + url.split("-")[2];
+                                        $(target).html(data);
+                                    }
+                                });
+                            });
+                        }
+
+                        $("#id_mun").change(function () {
+                            $.ajax({
+                                url: $("#AlmuniForm").attr("data-postu-url"),
+                                data: { "mun": $(this).val() },
+                                success: function (data) {
+                                    $("#id_post").html(data);
+                                }
+                            });
+                        });
+
+                        $("#id_post").change(function () {
+                            $.ajax({
+                                url: $("#AlmuniForm").attr("data-suku-url"),
+                                data: { "post": $(this).val() },
+                                success: function (data) {
+                                    $("#id_suk").html(data);
+                                }
+                            });
+                        });
+
+                        $("#id_suk").change(function () {
+                            $.ajax({
+                                url: $("#AlmuniForm").attr("data-aldeia-url"),
+                                data: { "suk": $(this).val() },
+                                success: function (data) {
+                                    $("#id_ald").html(data);
+                                }
+                            });
+                        });
+
+                        $("#id_faculdade").change(function () {
+                            $.ajax({
+                                url: $("#AlmuniForm").attr("data-departamento-url"),
+                                data: { "faculdade": $(this).val() },
+                                success: function (data) {
+                                    $("#id_departamento").html(data);
+                                }
+                            });
+                        });
+
+                    });
+                </script>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
