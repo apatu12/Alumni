@@ -1,0 +1,21 @@
+{% load static %}
+{% load crispy_forms_tags %}
+{% if study_form %}
+    <hr>
+    <h5>Dados Estudo</h5>
+    {% crispy study_form %}
+{% endif %}
+
+{% if career_form %}
+    <hr>
+    <h5>Dados Traballu</h5>
+    {% crispy career_form %}
+{% endif %}
+
+{% if outro %}
+    <hr>
+    <div class="form-group">
+        <label>Descreve Outro</label>
+        <input type="text" name="pos_outro" class="form-control">
+    </div>
+{% endif %}

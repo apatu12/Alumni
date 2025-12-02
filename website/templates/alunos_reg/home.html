@@ -1,0 +1,55 @@
+{% extends "website/layout.html" %} {% block content %}
+<div class="container">
+  <ol class="breadcrumb mb-2 mt-1">
+  <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+  <li class="breadcrumb-item active" aria-current="page">{{ legend|upper }}</li>
+</ol>
+<div class="row">
+  <div class="col-sm-12 mb-5">
+    <div class="card shadow-sm p-4">
+      <h3 class="mb-3 text-center">
+        Sistema Informasaun Antigos Alunos – UNTL
+      </h3>
+
+      <p style="font-size: 16px; text-align: justify">
+        Bem-vindo ao
+        <strong
+          >Sistema Informasaun Antigos Alunos da Universidade Nacional Timor
+          Lorosa’e (UNTL)</strong
+        >. Este sistema foi criado para recolher, organizar e atualizar dados
+        dos antigos estudantes que concluíram os seus estudos na UNTL. A
+        informação registada será utilizada para fins académicos, estatísticos e
+        administrativos, garantindo que a Universidade mantenha um contacto
+        atualizado com todos os seus graduados.
+      </p>
+
+      <p style="font-size: 16px; text-align: justify">
+        Antes de iniciar o processo de registo, por favor leia atentamente a
+        informação abaixo.
+      </p>
+
+      <!-- ALERTA PRINCIPAL (que tu pediste) -->
+      <div class="alert alert-info mt-3" style="font-size: 16px">
+        <strong>Atenção!</strong><br />
+        Este sistema é exclusivamente para os
+        <strong>Antigos Alunos da UNTL</strong>. <br /><br />
+        Se você for realmente um antigo aluno, pode prosseguir com o registo.
+        Caso contrário, o registo não é permitido.
+      </div>
+
+      <div class="d-flex justify-content-center mt-4 gap-3">
+        <!-- BOTÃO VOLTAR -->
+        <a href="javascript:history.back()" class="btn btn-secondary px-4 ml-2">
+          <i class="fa fa-arrow-left"></i> Voltar
+        </a>
+
+        <!-- BOTÃO REGISTAR -->
+        <a href="{% url 'alunos_add' %}" class="btn btn-success px-4 ml-2">
+          <i class="fa fa-check-circle"></i> Registar
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+{% endblock %} {% block skrip %} {% endblock skrip %}

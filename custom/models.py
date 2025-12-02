@@ -1,10 +1,14 @@
 from django.db import models
+from PIL import Image
 import uuid
 # Create your models here.
 class Faculdade(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 	code = models.CharField(max_length=50, verbose_name='Sigla', null=False)
 	name = models.CharField(max_length=50, verbose_name='Nome da Faculdade', null=False)
+
+	class Meta:
+		ordering = ['name']   # <----- ORDER BY name A–Z
 
 	def __str__(self):
 		template = '{0.name}'
@@ -26,6 +30,9 @@ class Municipality(models.Model):
 	code = models.CharField(max_length=50, verbose_name='Sigla')
 	hckey = models.CharField(max_length=25, verbose_name='Hckey', blank=True, null=True)
 	name = models.CharField(max_length=50, verbose_name='Nome Municipio', null=False)
+	
+	class Meta:
+		ordering = ['name']   # <----- ORDER BY name A–Z
 
 	def __str__(self):
 		template = '{0.name}'
@@ -114,7 +121,12 @@ class CarouselSlide(models.Model):
 
 	class Meta:
 		ordering = ['order']
-
+	def save(self, *args, **kwargs):
+		super().save(*args, **kwargs)
+		img = Image.open(self.image.path)
+		target_size = (1450, 575)
+		img = img.resize(target_size, Image.Resampling.LANCZOS)
+		img.save(self.image.path)
 	def __str__(self):
 		return f"Slide: {self.title}"
 
@@ -151,3 +163,4 @@ class ContactMessage(models.Model):
 
 	def __str__(self):
 		return f"{self.nome} - {self.email}"
+

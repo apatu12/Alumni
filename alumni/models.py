@@ -7,6 +7,8 @@ import uuid
 from custom.models import Faculdade, Departamento, Municipality, \
      AdministrativePost, Village, SubVillage, Nasaun, Year, nivelmaster
 from simple_history.models import HistoricalRecords
+from PIL import Image
+
 # Create your models here.
 class ActiveManager(models.Manager):
     def get_queryset(self):
@@ -23,9 +25,10 @@ class Alumni(models.Model):
     mother_name = models.CharField(max_length=120, null=True, blank=True, verbose_name='Nome Da Mãe')
     email = models.EmailField(max_length=150, null=True, blank=True, verbose_name='E-Mail')
     phone_number = models.CharField(max_length=20, null=True, blank=True, verbose_name='Nu Telemovel')
-    pos = models.CharField(max_length=50, verbose_name='Status Ataul', choices=[('Em Estudo','Em Estudo'),('No Trabalho','No Trabalho'),('Em Estudo e No Trabalho','Em Estudo e No Trabalho'),('Outro','Outro')], default='Outro', null=True)
+    pos = models.CharField(max_length=50, verbose_name='Status Ataul', choices=[('Em Estudo','Em Estudo'),('No Trabalho','No Trabalho'),('Em Estudo e No Trabalho','Em Estudo e No Trabalho'),('Outro','Outro')], default='Outro', null=True, blank=True)
+    pos_outro = models.CharField(max_length=150, null=True, blank=True, verbose_name="Outro Descrição")
     photo = models.ImageField(upload_to=alumni_photo, verbose_name='Imagen', validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif'])], null=True, blank=True) 
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="alumnicreatedbys")
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="alumniupdatetedbys")
@@ -50,6 +53,14 @@ class Alumni(models.Model):
 
     def hard_delete(self):
         super().delete()
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.photo:
+            img = Image.open(self.photo.path)
+            target_size = (480, 640) 
+            img = img.resize(target_size, Image.Resampling.LANCZOS)
+            img.save(self.photo.path)
 
     objects = models.Manager()  
     active_objects = ActiveManager()
@@ -181,11 +192,11 @@ class Career(models.Model):
         verbose_name_plural='04-Dadus_Alumni_Careira'
 
 class FurtherStudy(models.Model):
-    alumni = models.ForeignKey(Alumni, on_delete=models.CASCADE, related_name="further_studies")
+    alumni = models.ForeignKey(Alumni, on_delete=models.CASCADE, null=True, blank=True, related_name="further_studies")
     study_level = models.ForeignKey(nivelmaster, on_delete=models.CASCADE, null=True, verbose_name="Nivel Estudo")
     major = models.CharField(max_length=255, null=True, blank=True, verbose_name="Especialidade")
     university = models.CharField(max_length=255, null=True, blank=True, verbose_name="Univesidade")
-    country = models.ForeignKey(Nasaun, on_delete=models.CASCADE, null=True, verbose_name="País")
+    country = models.ForeignKey(Nasaun, on_delete=models.CASCADE, null=True, blank=True, verbose_name="País")
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="estudocreatedbys")
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="estudoupdatetedbys")
@@ -219,7 +230,7 @@ class FurtherStudy(models.Model):
         verbose_name_plural='05-Dadus_Alumni_Estudo'
 
 class AlumniUser(models.Model):
-    alumni = models.OneToOneField(Alumni, on_delete=models.CASCADE, related_name="account")
+    alumni = models.OneToOneField(Alumni, on_delete=models.CASCADE, null=True, blank=True, related_name="account" )
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="Alumnicreatedbys")
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)

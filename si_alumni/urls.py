@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls import handler404, handler500
 from main import views as main_views
+from django.conf import settings
+from django.conf.urls.static import static
 
 admin.site.site_title ='SI-ALUMNI-UNTL'
 admin.site.site_header ='SI-ALUMNI-UNTL'
@@ -26,9 +28,14 @@ admin.site.index_title ='SI-ALUMNI-UNTL'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('website.urls'), name='web-home'),
+    path('Antigos-Alunos/', include('alumni.urls')),
+    path('Ajax/', include('custom.urls')),
     path('Admin-Home.html/', main_views.home, name='index'),
     path('Login-Page.html/', main_views.loginPage, name='login'),
     path('logout-Page.html/', main_views.logout_view, name='logout'),
 ]
 handler404 = 'main.views.error_404'
 handler500 = 'main.views.error_500'
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,0 +1,226 @@
+{% load static %} {% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+
+    <!-- Bootstrap CSS -->
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+      integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
+      crossorigin="anonymous"
+    />
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Lora:400,700"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="{% static 'theme/css/font-awesome.min.css'%}"
+    />
+    <link rel="shorcut icon" href="{% static 'image/UNTL1.png' %}" />
+    {% if title %}
+    <title>SI-ALUMNI-UNTL-{{ title }}</title>
+    {% else %}
+    <title>SI-ALUMNI-UNTL-TIMOR-LESTE</title>
+    {% endif %}
+  </head>
+  <body>
+    <div class="container mt-5">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+          <li class="breadcrumb-item active" aria-current="page">
+            {{title|upper}}
+          </li>
+        </ol>
+      </nav>
+      <div class="row">
+        {% if messages %} {% for message in messages %}
+
+        <div class="alert alert-{{message.tags}} py-2">
+          {{message}}
+          <button
+            type="button"
+            class="close"
+            data-dismiss="alert"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        {% endfor %} {% endif %}
+        <!-- Table Content -->
+        <div class="col-12 col-md-6 col-lg-12">
+          <div class="card rounded">
+            <div class="card-header" style="background: #41d5f0">
+              <h6 class="font-weight-bold text-white">
+                <i class="fa fa-list"></i> {{legend|upper}}
+              </h6>
+            </div>
+            <div class="card-body">
+              <form
+                method="post"
+                id="AlmuniForm"
+                enctype="multipart/form-data"
+                data-postu-url="{% url 'ajax-load-postu' %}"
+                data-suku-url="ajax-load-suku"
+                data-aldeia-url="{% url 'ajax-load-aldeia' %}"
+                data-departamento-url="{% url 'ajax-load-dep' %}"
+                novalidate
+              >
+                {% csrf_token %} {% crispy form %}
+              </form>
+              <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+              <script type="text/javascript">
+                //load Imagen
+                function myFunction() {
+                  var image = document.getElementById('output')
+                  image.src = URL.createObjectURL(event.target.files[0])
+                }
+              </script>
+              <script type="text/javascript">
+                $(document).ready(function () {
+                    $("#id_mun").change(function () {
+                        var url = $("#AlmuniForm").attr("data-postu-url");
+                        var munId = $(this).val();
+
+                        $.ajax({
+                            url: url,
+                            data: {
+                                'mun': munId
+                            },
+                            success: function (data) {
+                                $("#id_post").html(data);
+                            }
+                        });
+                    });
+                    $("#id_post").change(function () {
+                        var url = $("#AlmuniForm").attr("data-suku-url");
+                        var postId = $(this).val();
+
+                        $.ajax({
+                            url: '{% url 'ajax-load-suku' %}',
+                            data: {
+                                'post': postId
+                            },
+                            success: function (data) {
+                                $("#id_suk").html(data);
+                            }
+                        });
+                    });
+
+                     $("#id_suk").change(function () {
+                        var url = $("#AlmuniForm").attr("data-aldeia-url");
+                        var sukId = $(this).val();
+
+                        $.ajax({
+                            url: url,
+                            data: {
+                                'suk': sukId
+                            },
+                            success: function (data) {
+                                $("#id_ald").html(data);
+                            }
+                        });
+                    });
+                     $("#id_faculdade").change(function () {
+                        var url = $("#AlmuniForm").attr("data-departamento-url");
+                        var faculdadeId = $(this).val();
+
+                        $.ajax({
+                            url: url,
+                            data: {
+                                'faculdade': faculdadeId
+                            },
+                            success: function (data) {
+                                $("#id_departamento").html(data);
+                            }
+                        });
+                    });
+                    $("#id_departamento").change(function () {
+                    var url = $("#AlmuniForm").attr("data-doce-url");
+                    var departamentoId = $(this).val();
+
+                    $.ajax({
+                        url: url,
+                        data: {
+                            'departamento': departamentoId
+                        },
+                        success: function (data) {
+                            $("#id_orientadorI").html(data);
+                            $("#id_orientadorII").html(data);
+                        }
+                    });
+                });
+                $("#id_departamento").change(function () {
+                    var url = $("#AlmuniForm").attr("data-doce-url");
+                    var departamentoId = $(this).val();
+
+                    $.ajax({
+                        url: url,
+                        data: {
+                            'departamento': departamentoId
+                        },
+                        success: function (data) {
+                            // render dulu semua opsi ke dua dropdown
+                            $("#id_orientadorI").html(data);
+                            $("#id_orientadorII").html(data);
+
+                            // Panggil fungsi untuk filter ulang jika sudah dipilih
+                            filterOrientadores();
+                        }
+                    });
+                });
+
+                // Fungsi untuk menyembunyikan pilihan yang sama
+               $(document).ready(function () {
+
+            function loadPosForm() {
+                var posValue = $("#id_pos").val();
+                var hashed = "{{ aluno.hashed|default:'' }}";  // jika di halaman update
+
+                $.ajax({
+                    url: "{% url 'ajax-pos-form' %}",
+                    data: {
+                        "pos": posValue,
+                        "hashed": hashed
+                    },
+                    success: function (data) {
+                        $("#status_dynamic_area").html(data); // load form dinamis
+                    }
+                });
+            }
+
+            // trigger ketika user memilih POS
+            $("#id_pos").change(function () {
+                loadPosForm();
+            });
+
+            // load saat halaman pertama dibuka
+            loadPosForm();
+        });
+
+                });
+              </script>
+            </div>
+          </div>
+        </div>
+        <!-- end content col -->
+      </div>
+      <!-- end row -->
+    </div>
+    <!-- end container -->
+  </body>
+</html>

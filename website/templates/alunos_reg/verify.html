@@ -1,0 +1,241 @@
+{% extends 'Main/Admin/layout.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="container mt-5">
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">Inicio</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ legend|upper }}</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-12">
+
+            <div class="card shadow-sm rounded">
+
+                <!-- HEADER -->
+                <div class="card-header text-white d-flex" style="background: #41d5f0;">
+                    <h5 class="mb-0"><i class="fa fa-id-card"></i> {{ legend|upper }}</h5>
+
+                    <div class="ml-auto">
+                        <a href="{% url 'edit-my-data' alumni.hashed %}" class="btn btn-outline-warning btn-sm">
+                            <i class="fa fa-edit"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+
+                            <!-- FOTO -->
+                            <tr>
+                                <td width="40%">Foto</td>
+                                <td>
+                                    {% if alumni.photo %}
+                                        <img src="{{ alumni.photo.url }}" width="180" class="img-thumbnail">
+                                    {% else %}
+                                        <i>La iha imajen</i>
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                            <!-- DADOS PESSOAIS -->
+                            <tr><th colspan="2" class="bg-light">Dados Pessoais</th></tr>
+
+                            <tr>
+                                <td>Nome Completo</td>
+                                <td><strong>{{ alumni.name }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>NRE</td>
+                                <td><strong>{{ alumni.registration_no }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>Sexo</td>
+                                <td><strong>{{ alumni.sex }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>Data de Nascimento</td>
+                                <td><strong>{{ alumni.dob }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>Naturalidade</td>
+                                <td><strong>{{ alumni.pob }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>Nome do Pai</td>
+                                <td><strong>{{ alumni.father_name }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>Nome da Mãe</td>
+                                <td><strong>{{ alumni.mother_name }}</strong></td>
+                            </tr>
+
+                            <!-- CONTATOS -->
+                            <tr><th colspan="2" class="bg-light">Contatos</th></tr>
+
+                            <tr>
+                                <td>Telemovel</td>
+                                <td><strong>{{ alumni.phone_number }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>Email</td>
+                                <td><strong>{{ alumni.email }}</strong></td>
+                            </tr>
+
+                            <!-- ENDEREÇO -->
+                            <tr><th colspan="2" class="bg-info">Endereço</th></tr>
+
+                            <tr>
+                                <td>Município</td>
+                                <td><strong>{{ alumni.address.mun }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>Posto Administrativo</td>
+                                <td><strong>{{ alumni.address.post }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>Suco</td>
+                                <td><strong>{{ alumni.address.suk }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>Aldeia</td>
+                                <td><strong>{{ alumni.address.ald }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>Detalhe</td>
+                                <td><strong>{{ alumni.address.detail_address }}</strong></td>
+                            </tr>
+
+                            <!-- ACADEMIC -->
+                            <tr><th colspan="2" class="bg-warning">Informação Académica</th></tr>
+
+                            <tr>
+                                <td>Faculdade</td>
+                                <td><strong>{{ alumni.academic.faculty }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>Departamento</td>
+                                <td><strong>{{ alumni.academic.department }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>Ano Início</td>
+                                <td><strong>{{ alumni.academic.year_start }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>Ano Termina</td>
+                                <td><strong>{{ alumni.academic.year_graduation }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>Título de Tese</td>
+                                <td><strong>{{ alumni.academic.thesis_title }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>Orientador I</td>
+                                <td><strong>{{ alumni.academic.advisor_1 }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>Orientador II</td>
+                                <td><strong>{{ alumni.academic.advisor_2 }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>IPC</td>
+                                <td><strong>{{ alumni.academic.gpa }}</strong></td>
+                            </tr>
+
+                            <!-- CAREER -->
+                            <tr><th colspan="2" class="bg-success">Carreira</th></tr>
+
+                            {% for c in alumni.careers.all %}
+                            <tr>
+                                <td>Instituição</td>
+                                <td><strong>{{ c.institution }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>Posição</td>
+                                <td><strong>{{ c.position }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>Departamento</td>
+                                <td><strong>{{ c.department }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>País</td>
+                                <td><strong>{{ c.country }}</strong></td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="2"><i>La iha dadus carreira</i></td></tr>
+                            {% endfor %}
+
+                            <!-- Further Study -->
+                            <tr><th colspan="2" class="bg-primary text-white">Estudo Kontinua</th></tr>
+
+                            {% for f in alumni.further_studies.all %}
+                            <tr>
+                                <td>Nivel</td>
+                                <td><strong>{{ f.study_level }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>Especialidade</td>
+                                <td><strong>{{ f.major }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>Universidade</td>
+                                <td><strong>{{ f.university }}</strong></td>
+                            </tr>
+
+                            <tr>
+                                <td>País</td>
+                                <td><strong>{{ f.country }}</strong></td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="2"><i>La iha estudio kontinua</i></td></tr>
+                            {% endfor %}
+
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,194 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="container mt-5">
+    <nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'index' %}">Inicio</a></li>
+    {% if page == 'Alumni' or page == 'Alumni_active' %}
+    <li class="breadcrumb-item"><a href="#" onclick="self.history.back()">Voltar</a></li>
+    {% else %}
+
+    {% endif %}
+    <li class="breadcrumb-item active" aria-current="page">{{legend|upper}}</li>
+  </ol>
+</nav>
+    <div class="row">
+        <!-- Table Content -->
+        <div class="col-12 col-md-6 col-lg-12">
+          {% if page == 'Alumni' %}
+              <div class="card mb-2">
+            <div class="card-body text-center">
+              <a href="{% url 'a-submit' %}" class="btn btn-danger btn-sm"><i class="fa fa-list"> Nova Submição</i></a>
+              <a href="" class="btn btn-success btn-sm"><i class="fa fa-list"> Dados Históricos</i></a>
+              <a href="{% url 'ap-list' %}" class="btn btn-info btn-sm"><i class="fa fa-print"> Imprime Dados</i></a>
+            </div>
+          </div>
+          {% else %}
+
+          {% endif %}
+            <div class="card rounded">
+                    {% if page == 'Alumni' %}
+                    <div class="card-header" style="background: #41d5f0;">
+                        <h6 class="font-weight-bold text-white"><i class="fa fa-list"></i> {{legend|upper}}</h6>
+                        </div>
+                    {% else %}
+                     <div class="card-header d-flex justify-content-between align-items-center" style="background: #41d5f0;">
+                    <h6 class="font-weight-bold text-white mb-0">
+                        <i class="fa fa-list"></i> {{ legend|upper }}
+                    </h6>
+                    <a href="#" class="btn btn-danger btn-sm" onclick="self.history.back()">
+                        <i class="fa fa-backward"></i> Volta
+                    </a>
+                </div>
+                    {% endif %}
+                
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <!-- BUTTON -->
+                        <button type="button" class="btn btn-success btn-sm mb-2" id="btn-activate">
+                           <i class="fa fa-check"></i> Activa
+                        </button>
+
+                        <button type="button" class="btn btn-danger btn-sm mb-2" id="btn-deactivate">
+                            <i class="fa fa-times"></i> Desativa
+                        </button>
+
+                        <form id="alumni-form">
+                            {% csrf_token %}
+
+                            <table id="example2" class="table table-bordered table-sm">
+                                <thead class="text-center">
+                                    <tr>
+                                        <th><input type="checkbox" id="select-all"></th>
+                                        <th>No.</th>
+                                        <th>NRE</th>
+                                        <th>Nome Completo</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for obj in objects %}
+                                    <tr id="row-{{ obj.id }}">
+                                        <td class="text-center">
+                                            <input type="checkbox" name="selected_ids" value="{{ obj.id }}">
+                                        </td>
+                                        <td>{{forloop.counter}}</td>
+                                        <td>{{obj.registration_no}}</td>
+                                        <td>{{obj.name}}</td>
+                                        <td id="status-{{ obj.id }}">
+                                            {% if obj.is_active %}
+                                                <span class="badge badge-success">Activated</span>
+                                            {% else %}
+                                                <span class="badge badge-danger">Not Active</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- end row -->
+</div> <!-- end container -->
+<!-- MODAL -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">confirmação</h5>
+        <button type="button" class="btn-close" data-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <p id="modal-message"></p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal"><i class="fa fa-window-close"></i> Cancelar</button>
+        <button type="button" id="confirm-action" class="btn btn-primary btn-sm"><i class="fa fa-save"></i> Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+// SELECT ALL
+document.getElementById('select-all').onclick = function() {
+    let boxes = document.querySelectorAll('input[name="selected_ids"]');
+    boxes.forEach(b => b.checked = this.checked);
+}
+
+let actionType = ""; // activate or deactivate
+
+// OPEN MODAL
+$("#btn-activate").click(function () {
+    actionType = "activate";
+    $("#modal-message").text("Ativar esses antigos alunos?");
+    $("#confirmModal").modal("show");
+});
+
+$("#btn-deactivate").click(function () {
+    actionType = "deactivate";
+    $("#modal-message").text("Desativar esses Antigos alunos?");
+    $("#confirmModal").modal("show");
+});
+
+// CONFIRM ACTION
+$("#confirm-action").click(function () {
+
+    let selected = [];
+    $("input[name='selected_ids']:checked").each(function () {
+        selected.push($(this).val());
+    });
+
+    if (selected.length === 0) {
+        alert("Por Favor Selecione pelo menos 1 linha!");
+        return;
+    }
+
+    $.ajax({
+        url: "{% url 'alumni_ajax_update' %}",
+        type: "POST",
+        data: {
+            "ids": selected,
+            "action": actionType,
+            "csrfmiddlewaretoken": "{{ csrf_token }}",
+        },
+        success: function (response) {
+
+            response.updated_ids.forEach(function(id) {
+                let statusCell = $("#status-" + id);
+
+                if (actionType === "activate") {
+                    statusCell.html('<span class="badge badge-success">Activated</span>');
+                } else {
+                    statusCell.html('<span class="badge badge-danger">Not Active</span>');
+                }
+            });
+
+            $("#confirmModal").modal("hide");
+
+            // SWEETALERT
+            Swal.fire({
+                icon: 'success',
+                title: 'Susesu!',
+                text: response.message,
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+
+    });
+});
+</script>
+
+{% endblock %}

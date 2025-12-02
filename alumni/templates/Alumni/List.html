@@ -1,0 +1,116 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="container mt-5">
+    <nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'index' %}">Inicio</a></li>
+    {% if page == 'Alumni' or page == 'Alumni_active' %}
+    <li class="breadcrumb-item"><a href="#" onclick="self.history.back()">Voltar</a></li>
+    {% else %}
+
+    {% endif %}
+    <li class="breadcrumb-item active" aria-current="page">{{legend|upper}}</li>
+  </ol>
+</nav>
+    <div class="row">
+        <!-- Table Content -->
+        <div class="col-12 col-md-6 col-lg-12">
+          {% if page == 'Alumni' %}
+              <div class="card mb-2">
+            <div class="card-body text-center">
+              <a href="{% url 'a-submit' %}" class="btn btn-danger btn-sm"><i class="fa fa-list"> Nova Submição</i></a>
+              <a href="" class="btn btn-success btn-sm"><i class="fa fa-list"> Dados Históricos</i></a>
+              <a href="{% url 'ap-list' %}" class="btn btn-info btn-sm"><i class="fa fa-print"> Imprime Dados</i></a>
+            </div>
+          </div>
+          {% else %}
+
+          {% endif %}
+            <div class="card rounded">
+                    {% if page == 'Alumni' %}
+                    <div class="card-header" style="background: #41d5f0;">
+                        <h6 class="font-weight-bold text-white"><i class="fa fa-list"></i> {{legend|upper}}</h6>
+                        </div>
+                    {% else %}
+                     <div class="card-header d-flex justify-content-between align-items-center" style="background: #41d5f0;">
+                    <h6 class="font-weight-bold text-white mb-0">
+                        <i class="fa fa-list"></i> {{ legend|upper }}
+                    </h6>
+                    <a href="#" class="btn btn-danger btn-sm" onclick="self.history.back()">
+                        <i class="fa fa-backward"></i> Volta
+                    </a>
+                </div>
+                    {% endif %}
+                
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="example2" class="table table-bordered table-sm">
+                            <thead class="text-center">
+                                <tr>
+                                    <th>No.</th>
+                                    <th><strong>NRE</strong></th>
+                                    <th>Nome Completo</th>
+                                    <th>Sexo</th>
+                                    <th>Data Do Nascimento</th>
+                                    <th>Faculdade</th>
+                                    <th>Munícipio</th>
+                                    <th>Status</th>
+                                    <th>#</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for obj in objects %}
+                                    <tr>
+                                        <td>{{forloop.counter}}</td>
+                                        <td>{{obj.registration_no}}</td>
+                                        <td>{{obj.name}}</td>
+                                        <td>{{obj.sex}}</td>
+                                        <td>{{obj.dob}}</td>
+                                          <td> {% if  obj.academic and obj.academic.faculty %}
+                                              {{ obj.academic.faculty.name   }}
+                                              {% else %}
+                                              -
+                                          {% endif %}</td>
+                                <td>
+                                    {% if  obj.address and obj.address.mun %}
+                                    {{ obj.address.mun.name }}
+                                    {% else %}
+                                    -        
+                                {% endif %}
+                            </td>
+                                        <td>
+                                            {% if obj.is_active %}
+                                                <span class="badge badge-success rounded-pill px-3"><i class="fa fa-check"></i> Activado</span>
+                                            {% else %}
+                                            <span class="badge badge-danger rounded-pill px-3"><i class="fa fa-times"></i> Ainda Não</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if page == 'Alumni_active' %}
+                                        <input type="checkbox" name="selected_ids" value="{{ obj.id }}" class="form-check-input">
+                                    {% else %}
+                                        {% if group == 'Admin' %}
+                                            <a href="{% url 'al-detail' obj.hashed %}" 
+                                               class="btn btn-info btn-sm">
+                                                <i class="fa fa-search-plus"></i>
+                                            </a>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- end row -->
+</div> <!-- end container -->
+
+{% endblock %}

@@ -1,0 +1,211 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <!-- BREADCRUMB -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">INÍCIO</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'a-list' %}">LISTA DOS ANTIGOS ALUNOS</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ legend|upper }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card rounded">
+                <div class="card-header bg-primary">
+                    <h6 class="text-white mb-0">
+                        <i class="fa fa-info-circle"></i> {{ legend|upper }}
+                    </h6>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row">
+                        <!-- FOTO -->
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fa fa-camera"></i> Foto</h6>
+                                </div>
+                                <div class="card-body text-center">
+
+                                    {% if alumni.photo %}
+                                        <img src="{{ alumni.photo.url }}" 
+                                             class="rounded img-thumbnail" 
+                                             width="100%" height="220px">
+                                    {% else %}
+                                        <img src="{% static 'image/UNTL.png' %}" 
+                                             class="rounded img-thumbnail" 
+                                             width="100%">
+                                    {% endif %}
+
+                                    <button class="btn btn-warning btn-sm mt-3" onclick="window.print()">
+                                        <i class="fa fa-print"></i> Print
+                                    </button>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DADUS PESSOAIS -->
+                        <div class="col-md-8 mb-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fa fa-user"></i> Dadus Pessoais</h6>
+                                </div>
+                                <div class="card-body">
+                                    <table class="table table-bordered table-sm" width="100%">
+                                        <tr><th>NRE</th><td>: {{ alumni.registration_no }}</td></tr>
+                                        <tr><th>Nome</th><td>: {{ alumni.name }}</td></tr>
+                                        <tr><th>Sexo</th><td>: {{ alumni.sex }}</td></tr>
+                                        <tr><th>Data Nascimento</th><td>: {{ alumni.dob }}</td></tr>
+                                        <tr><th>Naturalidade</th><td>: {{ alumni.pob }}</td></tr>
+                                        <tr><th>Pai</th><td>: {{ alumni.father_name }}</td></tr>
+                                        <tr><th>Mãe</th><td>: {{ alumni.mother_name }}</td></tr>
+                                        <tr><th>Email</th><td>: {{ alumni.email }}</td></tr>
+                                        <tr><th>Nu Telemovel</th><td>: {{ alumni.phone_number }}</td></tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ACADEMIC -->
+                        <div class="col-md-8 mb-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fa fa-book"></i> Área Académica</h6>
+                                </div>
+                                <div class="card-body">
+                                    {% if alumni.academic %}
+                                    <table class="table table-bordered table-sm" width="100%">
+                                        <tr><th>Faculdade</th><td>: {{ alumni.academic.faculty }}</td></tr>
+                                        <tr><th>Departamento</th><td>: {{ alumni.academic.department }}</td></tr>
+                                        <tr><th>Ano Início</th><td>: {{ alumni.academic.year_start }}</td></tr>
+                                        <tr><th>Ano Graduação</th><td>: {{ alumni.academic.year_graduation }}</td></tr>
+                                        <tr><th>Orientador I</th><td>: {{ alumni.academic.advisor_1 }}</td></tr>
+                                        <tr><th>Orientador II</th><td>: {{ alumni.academic.advisor_2 }}</td></tr>
+                                        <tr><th>Título Teze</th><td>: {{ alumni.academic.thesis_title }}</td></tr>
+                                        <tr><th>IPC</th><td>: {{ alumni.academic.gpa }}</td></tr>
+                                        <tr><th>Predicado</th><td>: {{ alumni.academic.predicate }}</td></tr>
+                                    </table>
+                                    {% else %}
+                                        <p class="text-danger">No academic record found.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ENDEREÇO -->
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fa fa-map"></i> Endereço</h6>
+                                </div>
+                                <div class="card-body">
+                                    {% if alumni.address %}
+                                    <table class="table table-bordered table-sm" width="100%">
+                                        <tr><th>Município</th><td>: {{ alumni.address.mun }}</td></tr>
+                                        <tr><th>Posto</th><td>: {{ alumni.address.post }}</td></tr>
+                                        <tr><th>Suco</th><td>: {{ alumni.address.suk }}</td></tr>
+                                        <tr><th>Aldeia</th><td>: {{ alumni.address.ald }}</td></tr>
+                                        <tr><th>Detail Endereço</th><td>: {{ alumni.address.detail_address }}</td></tr>
+                                    </table>
+                                    {% else %}
+                                        <p class="text-danger">No address information.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CAREER -->
+                        <div class="col-md-12 mb-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fa fa-briefcase"></i> Carreira</h6>
+                                </div>
+                                <div class="card-body">
+                                    {% if alumni.careers.all %}
+                                        <table class="table table-bordered table-sm">
+                                            <thead>
+                                                <tr class="text-center">
+                                                    <th>Instituição</th>
+                                                    <th>Departamento</th>
+                                                    <th>Posição</th>
+                                                    <th>País</th>
+                                                    <th>Estado</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for c in alumni.careers.all %}
+                                                <tr>
+                                                    <td>{{ c.institution }}</td>
+                                                    <td>{{ c.department }}</td>
+                                                    <td>{{ c.position }}</td>
+                                                    <td>{{ c.country }}</td>
+                                                    <td>{{ c.job_field }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    {% else %}
+                                        <p class="text-danger">No career data.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FURTHER STUDIES -->
+                        <div class="col-md-12 mb-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fa fa-graduation-cap"></i> Estudo Avançado</h6>
+                                </div>
+                                <div class="card-body">
+                                    {% if alumni.further_studies.all %}
+                                        <table class="table table-bordered table-sm">
+                                            <thead>
+                                                <tr class="text-center">
+                                                    <th>Nível</th>
+                                                    <th>Especialidade</th>
+                                                    <th>Universidade</th>
+                                                    <th>País</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for f in alumni.further_studies.all %}
+                                                <tr>
+                                                    <td>{{ f.study_level }}</td>
+                                                    <td>{{ f.major }}</td>
+                                                    <td>{{ f.university }}</td>
+                                                    <td>{{ f.country }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    {% else %}
+                                        <p class="text-danger">No further study data.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- BACK BUTTON -->
+                        <a href="{% url 'a-list' %}" class="btn btn-danger mt-2">
+                            <i class="fa fa-arrow-left"></i> VOLTA
+                        </a>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

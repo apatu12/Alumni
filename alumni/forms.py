@@ -1,8 +1,12 @@
 from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, HTML
-from .models import Alumni, AlumniAddress, AcademicRecord, Career, FurtherStudy, 
+from alumni.models import Alumni, AlumniAddress, AcademicRecord, Career, FurtherStudy
 from custom.models import Faculdade, Departamento, Municipality, AdministrativePost, Village, SubVillage, Nasaun, nivelmaster
+from PIL import Image
+from uuid import UUID
+
+# Create Forms Here
 # =============================
 # Alumni Form
 # =============================
@@ -23,39 +27,43 @@ class AlumniForm(forms.ModelForm):
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
             Row(
-                Column('registration_no', css_class="form-group col-md-4 mb-0"),
-                Column('name', css_class="form-group col-md-6 mb-0"),
-                Column('sex', css_class="form-group col-md-2 mb-0"),
+                Column('registration_no', css_class="col-md-4 mb-0"),
+                Column('name', css_class="col-md-6 mb-0"),
+                Column('sex', css_class="col-md-2 mb-0"),
             ),
             Row(
-                Column('dob', css_class="form-group col-md-6 mb-0"),
-                Column('pob', css_class="form-group col-md-6 mb-0"),
+                Column('dob', css_class="col-md-6 mb-0"),
+                Column('pob', css_class="col-md-6 mb-0"),
             ),
             Row(
-                Column('father_name', css_class="form-group col-md-6 mb-0"),
-                Column('mother_name', css_class="form-group col-md-6 mb-0"),
+                Column('father_name', css_class="col-md-5 mb-0"),
+                Column('mother_name', css_class="col-md-5 mb-0"),
+                Column('phone_number', css_class="col-md-2 mb-0"),
             ),
             Row(
-                Column('phone_number', css_class="form-group col-md-6 mb-0"),
-                Column('email', css_class="form-group col-md-6 mb-0"),
+                Column('email', css_class="col-md-6 mb-0"),
+                Column('photo', css_class='', onchange="myFunction()"),
             ),
-            Row(
-                Column('photo', css_class="form-group col-md-12 mb-0", onchange="myFunction()"),
-            ),
-            HTML("""<center><img id='output' width='200'/></center>"""),
+            HTML("<center><img id='output' width='200' /></center>"),
             HTML("""
-                <div class="d-flex justify-content-end py-6 px-9 gap-2 mt-2">
-                    <button class="btn btn-sm btn-success" type="submit">Save <i class="fa fa-save"></i></button>
-                    <span class="btn btn-sm btn-danger ml-2" onclick="self.history.back()">
-                        <span class="btn-label"><i class="fa fa-arrow-left"></i></span> Fila
-                    </span>
+                <div class='d-flex justify-content-end py-2 gap-2 mt-2'>
+                    <button class='btn btn-success btn-sm mr-2' type='submit'>
+                        Save <i class='fa fa-save'></i>
+                    </button>
+                    <button class='btn btn-danger btn-sm' onclick='history.back()'>
+                        <i class='fa fa-window-close'></i> Fila
+                    </button>
                 </div>
             """)
         )
-
 # =============================
 # Alumni Address Form
 # =============================
+from django import forms
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Row, Column, HTML
+from .models import AlumniAddress, AdministrativePost, Village, SubVillage
+
 class AlumniAddressForm(forms.ModelForm):
     class Meta:
         model = AlumniAddress
@@ -63,38 +71,56 @@ class AlumniAddressForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['mun'].queryset = Municipality.objects.all()
+
+        # Semua dropdown dependent harus kosong dulu
         self.fields['post'].queryset = AdministrativePost.objects.none()
         self.fields['suk'].queryset = Village.objects.none()
         self.fields['ald'].queryset = SubVillage.objects.none()
 
+        # =========================
+        # 1. Jika POST (submit form)
+        # =========================
         if 'mun' in self.data:
             try:
-                mun_id = int(self.data.get('mun'))
-                self.fields['post'].queryset = AdministrativePost.objects.filter(municipality_id=mun_id)
+                mun_id = UUID(self.data.get('mun'))
+                self.fields['post'].queryset = AdministrativePost.objects.filter(
+                    municipality_id=mun_id
+                ).order_by('name')
             except (ValueError, TypeError):
                 pass
         elif self.instance.pk and self.instance.mun:
-            self.fields['post'].queryset = AdministrativePost.objects.filter(municipality=self.instance.mun)
+            self.fields['post'].queryset = AdministrativePost.objects.filter(
+                municipality=self.instance.mun
+            )
 
         if 'post' in self.data:
             try:
-                post_id = int(self.data.get('post'))
-                self.fields['suk'].queryset = Village.objects.filter(administrativePost_id=post_id)
+                post_id = UUID(self.data.get('post'))
+                self.fields['suk'].queryset = Village.objects.filter(
+                    administrativePost_id=post_id
+                ).order_by('name')
             except (ValueError, TypeError):
                 pass
         elif self.instance.pk and self.instance.post:
-            self.fields['suk'].queryset = Village.objects.filter(administrativePost=self.instance.post)
+            self.fields['suk'].queryset = Village.objects.filter(
+                administrativePost=self.instance.post
+            )
 
         if 'suk' in self.data:
             try:
-                suk_id = int(self.data.get('suk'))
-                self.fields['ald'].queryset = SubVillage.objects.filter(village_id=suk_id)
+                suk_id = UUID(self.data.get('suk'))
+                self.fields['ald'].queryset = SubVillage.objects.filter(
+                    village_id=suk_id
+                ).order_by('name')
             except (ValueError, TypeError):
                 pass
         elif self.instance.pk and self.instance.suk:
-            self.fields['ald'].queryset = SubVillage.objects.filter(village=self.instance.suk)
-
+            self.fields['ald'].queryset = SubVillage.objects.filter(
+                village=self.instance.suk
+            )
+        # =========================
+        # Crispy forms layout
+        # =========================
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
@@ -109,7 +135,9 @@ class AlumniAddressForm(forms.ModelForm):
             ),
             HTML("""
                 <div class="d-flex justify-content-end py-6 px-9 gap-2 mt-2">
-                    <button class="btn btn-sm btn-success" type="submit">Save <i class="fa fa-save"></i></button>
+                    <button class="btn btn-sm btn-success btn-sm mr-2" type="submit">
+                        Save <i class="fa fa-save"></i>
+                    </button>
                     <span class="btn btn-sm btn-danger ml-2" onclick="self.history.back()">
                         <span class="btn-label"><i class="fa fa-arrow-left"></i></span> Fila
                     </span>
@@ -224,6 +252,32 @@ class FurtherStudyForm(forms.ModelForm):
                 Column('country', css_class='form-group col-md-3 mb-0'),
             ),
             HTML("""
+                <div class="d-flex justify-content-end py-6 px-9 gap-2 mt-2">
+                    <button class="btn btn-sm btn-success" type="submit">Save <i class="fa fa-save"></i></button>
+                    <span class="btn btn-sm btn-danger ml-2" onclick="self.history.back()">
+                        <span class="btn-label"><i class="fa fa-arrow-left"></i></span> Fila
+                    </span>
+                </div>
+            """)
+        )
+
+# =============================
+# Status Alumni Form
+# =============================
+class AlumniStatusForm(forms.ModelForm):
+    class Meta:
+        model = Alumni
+        fields = ['pos']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.layout = Layout(
+            Row(
+                Column('pos', css_class='col-md-12'),
+            ),
+         HTML("""
                 <div class="d-flex justify-content-end py-6 px-9 gap-2 mt-2">
                     <button class="btn btn-sm btn-success" type="submit">Save <i class="fa fa-save"></i></button>
                     <span class="btn btn-sm btn-danger ml-2" onclick="self.history.back()">

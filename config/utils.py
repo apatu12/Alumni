@@ -2,6 +2,9 @@ import os, hashlib
 from uuid import uuid4
 from django.db import models
 
+def generate_random_string(length=12):
+    return uuid.uuid4().hex[:length]
+
 def alumni_photo(instance, filename):
     upload_to = 'Alumni_data/{}'.format(instance.registration_no)
     field = 'Foto'
