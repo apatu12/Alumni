@@ -81,6 +81,7 @@
                 novalidate
               >
                 {% csrf_token %} {% crispy form %}
+                
               </form>
               <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
               <script type="text/javascript">
@@ -135,55 +136,21 @@
                             }
                         });
                     });
-                     $("#id_faculdade").change(function () {
+                     $("#id_faculty").change(function () {
                         var url = $("#AlmuniForm").attr("data-departamento-url");
-                        var faculdadeId = $(this).val();
+                        var facultyId = $(this).val();
 
                         $.ajax({
                             url: url,
                             data: {
-                                'faculdade': faculdadeId
+                                'faculty': facultyId
                             },
                             success: function (data) {
-                                $("#id_departamento").html(data);
+                                $("#id_department").html(data);
                             }
                         });
                     });
-                    $("#id_departamento").change(function () {
-                    var url = $("#AlmuniForm").attr("data-doce-url");
-                    var departamentoId = $(this).val();
-
-                    $.ajax({
-                        url: url,
-                        data: {
-                            'departamento': departamentoId
-                        },
-                        success: function (data) {
-                            $("#id_orientadorI").html(data);
-                            $("#id_orientadorII").html(data);
-                        }
-                    });
-                });
-                $("#id_departamento").change(function () {
-                    var url = $("#AlmuniForm").attr("data-doce-url");
-                    var departamentoId = $(this).val();
-
-                    $.ajax({
-                        url: url,
-                        data: {
-                            'departamento': departamentoId
-                        },
-                        success: function (data) {
-                            // render dulu semua opsi ke dua dropdown
-                            $("#id_orientadorI").html(data);
-                            $("#id_orientadorII").html(data);
-
-                            // Panggil fungsi untuk filter ulang jika sudah dipilih
-                            filterOrientadores();
-                        }
-                    });
-                });
-
+                    
                 // Fungsi untuk menyembunyikan pilihan yang sama
                $(document).ready(function () {
 

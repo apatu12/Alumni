@@ -21,6 +21,7 @@ def load_aldeia(request):
     return render(request, 'ajax/load_aldeia.html', {'aldeia': aldeia})
 
 def load_dep(request):
-    fac_id = request.GET.get('faculdade')
-    dep = Departamento.objects.filter(faculdade_id=fac_id).order_by('name')
+    faculty_id = request.GET.get('faculty')
+    dep = Departamento.objects.filter(faculdade_id=faculty_id).order_by('name')
     return render(request, 'ajax/load_dep.html', {'dep': dep})
+

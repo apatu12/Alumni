@@ -1,0 +1,115 @@
+{% load static %}
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+          integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N"
+          crossorigin="anonymous" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Lora:400,700" rel="stylesheet" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static 'theme/css/font-awesome.min.css'%}" />
+    <link rel="shortcut icon" href="{% static 'image/UNTL1.png' %}" />
+
+    <title>SI-ALUMNI-UNTL-{{ title|default:"TIMOR-LESTE" }}</title>
+</head>
+<body>
+<div class="container mt-5">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ title|upper }}</li>
+        </ol>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} py-2 alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Main Card -->
+    <div class="card rounded">
+        <div class="card-header" style="background: #41d5f0">
+            <h6 class="font-weight-bold text-white">
+                <i class="fa fa-list"></i> {{ legend|upper }}
+            </h6>
+        </div>
+        <div class="card-body">
+            <!-- Main Form -->
+            <form method="post" id="mainForm">
+                {% csrf_token %}
+                {% crispy form %}
+
+                <!-- Dynamic Form Area -->
+                <div id="status_dynamic_area"></div>
+
+                <button class="btn btn-success mt-3 btn-sm" type="submit">
+                    <i class="fa fa-save"></i> Save
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery & Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+$(document).ready(function () {
+
+    // Load dynamic form berdasarkan pilihan pos
+    function loadPosForm() {
+        var posValue = $("#id_pos").val();
+        var hashed = "{{ aluno.hashed|default:'' }}";
+
+        $.ajax({
+            url: "{% url 'ajax-pos-form' %}",
+            data: {"pos": posValue, "hashed": hashed},
+            success: function (data) {
+                $("#status_dynamic_area").html(data);
+            }
+        });
+    }
+
+    // Trigger saat select berubah & load awal
+    $("#id_pos").change(loadPosForm);
+    loadPosForm();
+
+    // Submit form via AJAX & redirect
+    $('#mainForm').on('submit', function(e){
+        e.preventDefault();
+        $.ajax({
+            url: $(this).attr('action') || window.location.href,
+            method: 'POST',
+            data: $(this).serialize(),
+            success: function(data){
+                // Redirect setelah save
+                window.location.href = '/alumni_verify/' + "{{ aluno.hashed }}";
+            },
+            error: function(err){
+                alert("Gagal menyimpan data, silakan coba lagi.");
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>

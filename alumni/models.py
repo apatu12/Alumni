@@ -25,7 +25,7 @@ class Alumni(models.Model):
     mother_name = models.CharField(max_length=120, null=True, blank=True, verbose_name='Nome Da Mãe')
     email = models.EmailField(max_length=150, null=True, blank=True, verbose_name='E-Mail')
     phone_number = models.CharField(max_length=20, null=True, blank=True, verbose_name='Nu Telemovel')
-    pos = models.CharField(max_length=50, verbose_name='Status Ataul', choices=[('Em Estudo','Em Estudo'),('No Trabalho','No Trabalho'),('Em Estudo e No Trabalho','Em Estudo e No Trabalho'),('Outro','Outro')], default='Outro', null=True, blank=True)
+    pos = models.CharField(max_length=50, verbose_name='Status Ataul', choices=[('Em Estudo','Em Estudo'),('No Trabalho','No Trabalho'),('Em Estudo e No Trabalho','Em Estudo e No Trabalho'),('Outro','Outro')],  null=True, blank=True)
     pos_outro = models.CharField(max_length=150, null=True, blank=True, verbose_name="Outro Descrição")
     photo = models.ImageField(upload_to=alumni_photo, verbose_name='Imagen', validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif'])], null=True, blank=True) 
     is_active = models.BooleanField(default=False)

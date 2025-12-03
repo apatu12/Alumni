@@ -48,10 +48,10 @@ class AlumniForm(forms.ModelForm):
             HTML("""
                 <div class='d-flex justify-content-end py-2 gap-2 mt-2'>
                     <button class='btn btn-success btn-sm mr-2' type='submit'>
-                        Save <i class='fa fa-save'></i>
+                        Guardar <i class='fa fa-save'></i>
                     </button>
                     <button class='btn btn-danger btn-sm' onclick='history.back()'>
-                        <i class='fa fa-window-close'></i> Fila
+                        <i class='fa fa-window-close'></i> Voltar
                     </button>
                 </div>
             """)
@@ -59,11 +59,6 @@ class AlumniForm(forms.ModelForm):
 # =============================
 # Alumni Address Form
 # =============================
-from django import forms
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Row, Column, HTML
-from .models import AlumniAddress, AdministrativePost, Village, SubVillage
-
 class AlumniAddressForm(forms.ModelForm):
     class Meta:
         model = AlumniAddress
@@ -136,10 +131,10 @@ class AlumniAddressForm(forms.ModelForm):
             HTML("""
                 <div class="d-flex justify-content-end py-6 px-9 gap-2 mt-2">
                     <button class="btn btn-sm btn-success btn-sm mr-2" type="submit">
-                        Save <i class="fa fa-save"></i>
+                        Guardar <i class="fa fa-save"></i>
                     </button>
                     <span class="btn btn-sm btn-danger ml-2" onclick="self.history.back()">
-                        <span class="btn-label"><i class="fa fa-arrow-left"></i></span> Fila
+                        <span class="btn-label"><i class="fa fa-arrow-left"></i></span> Voltar
                     </span>
                 </div>
             """)
@@ -157,16 +152,18 @@ class AcademicRecordForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['faculty'].queryset = Faculdade.objects.all()
         self.fields['department'].queryset = Departamento.objects.none()
-
         if 'faculty' in self.data:
             try:
-                faculty_id = int(self.data.get('faculty'))
-                self.fields['department'].queryset = Departamento.objects.filter(faculdade_id=faculty_id)
+                suk_id = UUID(self.data.get('faculty'))
+                self.fields['department'].queryset = Departamento.objects.filter(
+                    faculdade_id=suk_id
+                ).order_by('name')
             except (ValueError, TypeError):
                 pass
-        elif self.instance.pk and self.instance.faculty:
-            self.fields['department'].queryset = Departamento.objects.filter(faculdade=self.instance.faculty)
-
+        elif self.instance.pk and self.instance.department:
+            self.fields['department'].queryset = Departamento.objects.filter(
+                faculdade=self.instance.faculty
+            )
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
@@ -189,9 +186,9 @@ class AcademicRecordForm(forms.ModelForm):
             ),
             HTML("""
                 <div class="d-flex justify-content-end py-6 px-9 gap-2 mt-2">
-                    <button class="btn btn-sm btn-success" type="submit">Save <i class="fa fa-save"></i></button>
+                    <button class="btn btn-sm btn-success" type="submit">Guardar <i class="fa fa-save"></i></button>
                     <span class="btn btn-sm btn-danger ml-2" onclick="self.history.back()">
-                        <span class="btn-label"><i class="fa fa-arrow-left"></i></span> Fila
+                        <span class="btn-label"><i class="fa fa-arrow-left"></i></span> Voltar
                     </span>
                 </div>
             """)
@@ -201,6 +198,10 @@ class AcademicRecordForm(forms.ModelForm):
 # Career Form
 # =============================
 class CareerForm(forms.ModelForm):
+    pos = forms.ChoiceField(label="----------",
+    choices=[('Em Estudo','Em Estudo'),('No Trabalho','No Trabalho'),
+             ('Em Estudo e No Trabalho','Em Estudo e No Trabalho'),('Outro','Outro')],
+    widget=forms.Select(attrs={'id': 'id_pos'}))
     class Meta:
         model = Career
         fields = ['job_field', 'institution', 'department', 'position', 'country']
@@ -220,14 +221,7 @@ class CareerForm(forms.ModelForm):
                 Column('position', css_class='form-group col-md-6 mb-0'),
                 Column('country', css_class='form-group col-md-6 mb-0'),
             ),
-            HTML("""
-                <div class="d-flex justify-content-end py-6 px-9 gap-2 mt-2">
-                    <button class="btn btn-sm btn-success" type="submit">Save <i class="fa fa-save"></i></button>
-                    <span class="btn btn-sm btn-danger ml-2" onclick="self.history.back()">
-                        <span class="btn-label"><i class="fa fa-arrow-left"></i></span> Fila
-                    </span>
-                </div>
-            """)
+
         )
 
 # =============================
@@ -251,14 +245,6 @@ class FurtherStudyForm(forms.ModelForm):
                 Column('university', css_class='form-group col-md-3 mb-0'),
                 Column('country', css_class='form-group col-md-3 mb-0'),
             ),
-            HTML("""
-                <div class="d-flex justify-content-end py-6 px-9 gap-2 mt-2">
-                    <button class="btn btn-sm btn-success" type="submit">Save <i class="fa fa-save"></i></button>
-                    <span class="btn btn-sm btn-danger ml-2" onclick="self.history.back()">
-                        <span class="btn-label"><i class="fa fa-arrow-left"></i></span> Fila
-                    </span>
-                </div>
-            """)
         )
 
 # =============================
@@ -271,18 +257,11 @@ class AlumniStatusForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['pos'].widget.attrs.update({'id': 'id_pos'}) 
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
             Row(
                 Column('pos', css_class='col-md-12'),
             ),
-         HTML("""
-                <div class="d-flex justify-content-end py-6 px-9 gap-2 mt-2">
-                    <button class="btn btn-sm btn-success" type="submit">Save <i class="fa fa-save"></i></button>
-                    <span class="btn btn-sm btn-danger ml-2" onclick="self.history.back()">
-                        <span class="btn-label"><i class="fa fa-arrow-left"></i></span> Fila
-                    </span>
-                </div>
-            """)
         )

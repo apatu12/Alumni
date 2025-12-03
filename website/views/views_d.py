@@ -48,7 +48,7 @@ def antigosalunos_create(request):
         'title': 'Registo Antigos Alunos',
         'legend': 'Registo Dados Pesoal Antigos Alunos'
     }
-    return render(request, 'alunos_reg/form12.html', context)
+    return render(request, 'alunos_reg/form.html', context)
 
 def aluno_address(request, hashed):
     try:
@@ -57,54 +57,55 @@ def aluno_address(request, hashed):
         messages.error(request, "Dados la hetan!")
         return redirect('reg_info')
 
-    # Cari alamat jika sudah ada, kalau belum buat instance baru
-    address, created = AlumniAddress.objects.get_or_create(alumni=aluno)
+    # Cari alamat yang sudah ada (termasuk soft-deleted)
+    address = AlumniAddress.objects.filter(alumni=aluno).first()
 
     if request.method == "POST":
         form = AlumniAddressForm(request.POST, instance=address)
         if form.is_valid():
-            form.save()
+            addr = form.save(commit=False)
+            addr.alumni = aluno        # wajib kalau address masih None
+            addr.save()
             messages.success(request, "Susesu")
             return redirect('aluno_estudo', hashed=aluno.hashed)
     else:
         form = AlumniAddressForm(instance=address)
 
-    context = {
+    return render(request, 'alunos_reg/form.html', {
         'form': form,
         'title': 'Registo Naturalidade',
         'legend': 'Registo Naturalidade',
-    }
-    return render(request, 'alunos_reg/form12.html', context)
-
+    })
 
 
 def aluno_estudo(request, hashed):
     try:
         aluno = Alumni.active_objects.get(hashed=hashed)
     except Alumni.DoesNotExist:
-        messages.error(request, "Dados laiha!")
+        messages.error(request, "Nao Existe")
         return redirect('reg_info')
+    estudo = AcademicRecord.objects.filter(alumni=aluno).first()
 
     if request.method == "POST":
-        form = AcademicRecordForm(request.POST)
+        form = AcademicRecordForm(request.POST, instance=estudo)
         if form.is_valid():
             study = form.save(commit=False)
-            study.alumni = aluno
+            study.alumni = aluno 
             study.save()
             messages.success(request, 'Estudo Registrado com Suseso!')
             return redirect('aluno_carrer', hashed=aluno.hashed)
     else:
-        form = AcademicRecordForm()
+        form = AcademicRecordForm(instance=estudo)
 
-    context = {
+    return render(request, 'alunos_reg/form.html', {
         'form': form,
         'title': 'Registo Estudo Académico',
         'legend': 'Registo Estudo Académico',
-    }
-    return render(request, 'alunos_reg/form12.html', context)
+    })
 
 
-def aluno_status(request, hashed):
+
+def aluno_statuss(request, hashed):
     aluno = Alumni.objects.get(hashed=hashed)
     if request.method == "POST":
         form = AlumniStatusForm(request.POST, instance=aluno)
@@ -120,59 +121,7 @@ def aluno_status(request, hashed):
         'title': 'Registo Status Atual',
         'legend': 'Registo Status Atual'
     }
-    return render(request, "alunos_reg/form12.html", context)
-
-
-
-def aluno_carrer(request, hashed):
-    try:
-        aluno = Alumni.active_objects.get(hashed=hashed)
-    except Alumni.DoesNotExist:
-        messages.error(request, "Dados laiha!")
-        return redirect('reg_info')
-
-    if request.method == "POST":
-        form = CareerForm(request.POST)
-        if form.is_valid():
-            study = form.save(commit=False)
-            study.alumni = aluno
-            study.save()
-            messages.success(request, 'Estudo Registrado com Suseso!')
-            return redirect('est-est', hashed=aluno.hashed)
-    else:
-        form = CareerForm()
-
-    context = {
-        'form': form,
-        'title': 'Registo Estudo Académico',
-        'legend': 'Registo Estudo Académico',
-    }
-    return render(request, 'alunos_reg/form12.html', context)
-
-def aluno_further(request, hashed):
-    try:
-        aluno = Alumni.active_objects.get(hashed=hashed)
-    except Alumni.DoesNotExist:
-        messages.error(request, "Dados laiha!")
-        return redirect('reg_info')
-    if request.method == "POST":
-        form = FurtherStudyForm(request.POST)
-        if form.is_valid():
-            fs = form.save(commit=False)
-            fs.alumni = aluno
-            fs.save()
-            messages.success(request, "Dados  registrado com suseso!")
-            messages.warning(request, "Favor Verifica antes De Submeter!")
-            return redirect('alumni_verify', hashed=aluno.hashed)
-    else:
-        form = FurtherStudyForm()
-
-    context = {
-        'form': form,
-        'title': 'Estudo Continua',
-        'legend': 'Estudo Continua',
-    }
-    return render(request, 'alunos_reg/form12.html', context)
+    return render(request, "alunos_reg/form.html", context)
 
 def alumni_verify(request, hashed):
     try:
@@ -205,62 +154,89 @@ def alumni_verify(request, hashed):
 def ajax_pos_form(request):
     pos = request.GET.get("pos")
     hashed = request.GET.get("hashed")
+    aluno = Alumni.objects.filter(hashed=hashed).first()
 
     study_form = None
     career_form = None
     outro = False
 
     if pos == "Em Estudo":
-        study_form = FurtherStudyForm()
-
+        study_form = FurtherStudyForm(prefix="study")
     elif pos == "No Trabalho":
-        career_form = CareerForm()
-
+        career_form = CareerForm(prefix="career")
     elif pos == "Em Estudo e No Trabalho":
-        study_form = FurtherStudyForm()
-        career_form = CareerForm()
-
+        study_form = FurtherStudyForm(prefix="study")
+        career_form = CareerForm(prefix="career")
     elif pos == "Outro":
         outro = True
 
-    html = render_to_string("alunos_reg/partials/pos_dynamic_form.html", {
-        "study_form": study_form,
-        "career_form": career_form,
-        "outro": outro
-    })
-
+    # Gunakan request untuk context agar csrf_token tersedia
+    html = render_to_string(
+        "alunos_reg/partials/pos_dynamic_form.html",
+        {
+            "study_form": study_form,
+            "career_form": career_form,
+            "outro": outro,
+            "aluno": aluno
+        },
+        request=request  
+    )
     return HttpResponse(html)
 
-
 def aluno_status(request, hashed):
-    aluno = Alumni.objects.get(hashed=hashed)
+    aluno = get_object_or_404(Alumni, hashed=hashed)
+
     if request.method == "POST":
-        form = AlumniStatusForm(request.POST, instance=aluno)
-        if form.is_valid():
-            obj = form.save()
-            pos = obj.pos
-            if pos == "Em Estudo" or pos == "Em Estudo e No Trabalho":
-                study_form = FurtherStudyForm(request.POST)
-                if study_form.is_valid():
-                    study = study_form.save(commit=False)
-                    study.alumni = aluno
-                    study.save()
+        status_form = AlumniStatusForm(request.POST, instance=aluno, prefix='status')
+        pos = request.POST.get('status-pos')
 
-            if pos == "No Trabalho" or pos == "Em Estudo e No Trabalho":
-                career_form = CareerForm(request.POST)
-                if career_form.is_valid():
-                    career = career_form.save(commit=False)
-                    career.alumni = aluno
-                    career.save()
+        # Dynamic forms
+        study_form = FurtherStudyForm(request.POST, prefix='study') if pos in ["Em Estudo", "Em Estudo e No Trabalho"] else None
+        career_form = CareerForm(request.POST, prefix='career') if pos in ["No Trabalho", "Em Estudo e No Trabalho"] else None
 
+        forms_valid = status_form.is_valid()
+        if study_form:
+            forms_valid = forms_valid and study_form.is_valid()
+        if career_form:
+            forms_valid = forms_valid and career_form.is_valid()
+
+        if forms_valid:
+            # Save status
+            status_form.save()
+
+            # Save study
+            if study_form:
+                study = study_form.save(commit=False)
+                study.alumni = aluno
+                study.save()
+
+            # Save career
+            if career_form:
+                career = career_form.save(commit=False)
+                career.alumni = aluno
+                career.save()
+
+            # Save Outro
             if pos == "Outro":
                 aluno.pos_outro = request.POST.get("pos_outro")
                 aluno.save()
 
             messages.success(request, "Status atualizado!")
-            return redirect("next_step")
+            return redirect("alumni_verify", hashed=aluno.hashed)
+        else:
+            # Kalau ada error, tampilkan di template
+            messages.error(request, "Terdapat error, cek form di bawah.")
 
     else:
-        form = AlumniStatusForm(instance=aluno)
+        status_form = AlumniStatusForm(instance=aluno, prefix='status')
+        study_form = FurtherStudyForm(prefix='study')
+        career_form = CareerForm(prefix='career')
 
-    return render(request, "alunos_reg/form12.html", {"form": form})
+    context = {
+        "form": status_form,
+        "study_form": study_form,
+        "career_form": career_form,
+        "aluno": aluno,
+    }
+
+    return render(request, "alunos_reg/status.html", context)

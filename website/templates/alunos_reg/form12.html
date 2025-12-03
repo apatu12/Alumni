@@ -125,21 +125,6 @@
                 <!-- JS Ajax -->
                 <script>
                     $(document).ready(function () {
-
-                        function ajaxLoad(idSelector, url, paramName) {
-                            $(idSelector).change(function () {
-                                var value = $(this).val();
-                                $.ajax({
-                                    url: url,
-                                    data: { [paramName]: value },
-                                    success: function (data) {
-                                        let target = "#id_" + url.split("-")[2];
-                                        $(target).html(data);
-                                    }
-                                });
-                            });
-                        }
-
                         $("#id_mun").change(function () {
                             $.ajax({
                                 url: $("#AlmuniForm").attr("data-postu-url"),
@@ -169,13 +154,14 @@
                                 }
                             });
                         });
-
-                        $("#id_faculdade").change(function () {
+                        $("#id_faculty").change(function () {
+                            var url = $("#AcademicForm").attr("data-departamento-url");
+                            var facultyId = $(this).val();
                             $.ajax({
-                                url: $("#AlmuniForm").attr("data-departamento-url"),
-                                data: { "faculdade": $(this).val() },
-                                success: function (data) {
-                                    $("#id_departamento").html(data);
+                                url: url,
+                                data: { 'faculty': facultyId },
+                                success: function(data) {
+                                    $("#id_department").html(data);  
                                 }
                             });
                         });

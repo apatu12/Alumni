@@ -18,12 +18,14 @@
     <div class="row">
         <!-- Table Content -->
         <div class="col-12 col-md-6 col-lg-12">
-          {% if page == 'Alumni' %}
+          {% if page == 'Alumni' or page == 'Home'  %}
               <div class="card mb-2">
             <div class="card-body text-center">
-              <a href="{% url 'a-submit' %}" class="btn btn-danger btn-sm"><i class="fa fa-list"> Nova Submição</i></a>
-              <a href="" class="btn btn-success btn-sm"><i class="fa fa-list"> Dados Históricos</i></a>
-              <a href="{% url 'ap-list' %}" class="btn btn-info btn-sm"><i class="fa fa-print"> Imprime Dados</i></a>
+                <a href="{% url 'a-list' %}" class="btn btn-success btn-sm mr-2 mb-2"><i class="fa fa-list"> Lista Geral</i></a>
+              <a href="{% url 'a-submit' %}" class="btn btn-danger btn-sm mr-2 mb-2"><i class="fa fa-list"> Nova Submição</i></a>
+              <a href="" class="btn btn-success btn-sm mr-2 mb-2"><i class="fa fa-list"> Dados Históricos</i></a>
+              <a href="{% url 'ap-list' %}" class="btn btn-info btn-sm mr-2 mb-2"><i class="fa fa-print"> Imprime Dados</i></a>
+               <a href="{% url 'ap-list' %}" class="btn btn-warning btn-sm mr-2 mb-2"><i class="fa fa-table"> Sumario Geral</i></a>
             </div>
           </div>
           {% else %}
@@ -34,6 +36,7 @@
                     <div class="card-header" style="background: #41d5f0;">
                         <h6 class="font-weight-bold text-white"><i class="fa fa-list"></i> {{legend|upper}}</h6>
                         </div>
+                    {% elif page == 'Home' %}
                     {% else %}
                      <div class="card-header d-flex justify-content-between align-items-center" style="background: #41d5f0;">
                     <h6 class="font-weight-bold text-white mb-0">
@@ -46,7 +49,8 @@
                     {% endif %}
                 
                 <div class="card-body">
-                    <div class="table-responsive">
+                   {% if page == 'Alumni' or page == 'Alumni_active' %}
+                     <div class="table-responsive">
                         <table id="example2" class="table table-bordered table-sm">
                             <thead class="text-center">
                                 <tr>
@@ -107,6 +111,45 @@
                             </tbody>
                         </table>
                     </div>
+                    {% elif page == 'Home'%}
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm">
+                            <thead style="background-color:#41d5f0;">
+                                <tr>
+                                <th rowspan="2">Nu</th>
+                                <th rowspan="2">Faculdade</th>
+                                <th colspan="2" class="text-center">Antigos Alunos</th>
+                                <th rowspan="2" class="text-center">Total</th>
+                            </tr>
+                            <tr>
+                                <th class="text-center">Mane</th>
+                                <th class="text-center">Feto</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for obj in objects1 %}
+                                    <tr>
+                                        <td>{{forloop.counter}}</td>
+                                        <td>{{obj.0.name}}</td>
+                                        <td class="text-center"><a href="">{{obj.1}}</a></td>
+                                        <td class="text-center"><a href="">{{obj.2}}</a></td>
+                                        <td class="text-center"><a href="">{{obj.3}}</a></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="2" class="text-centers"><center><strong><b>Total</b></strong></center></td>
+                                    <td class="text-center"><a href="">1</a></td>
+                                    <td class="text-center"><a href="">1</a></td>
+                                    <td class="text-center"><a href="">1</a></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    {% else %}
+
+                   {% endif %}
                 </div>
             </div>
         </div>

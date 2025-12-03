@@ -22,8 +22,26 @@ from alumni.models import Alumni, AlumniAddress, AcademicRecord, \
     Career, FurtherStudy, AlumniUser
 from django.views.decorators.csrf import csrf_exempt
 
-
 # Create your views here.
+@login_required
+@allowed_users(allowed_roles=['Admin', 'Vice_Reitor', 'Staff'])
+def home_Alumni(request):
+    group = request.user.groups.all()[0].name
+    objects1, objects2 = [],[]
+    fac = Faculdade.objects.all()
+    for data in fac:
+        data1 = AcademicRecord.active_objects.filter(alumni__sex="Masculino", faculty=data).count()
+        data2 = AcademicRecord.active_objects.filter(alumni__sex="Femenino", faculty=data).count()
+        totalfac = data1 + data2
+        objects1.append([data, data1, data2, totalfac])
+    context = {
+        'page':'Home',
+        'title': 'Sumario Geral Antigos ALunos',
+        'legend': 'Sumario Geral Antigos ALunos',
+        'objects1':objects1,
+    }
+    return render(request, 'Alumni/List.html', context)
+
 @login_required
 @allowed_users(allowed_roles=['Admin','Vice_Reitor','Staff'])
 def Alumnilist(request):
