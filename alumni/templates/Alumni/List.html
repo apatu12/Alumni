@@ -18,11 +18,11 @@
     <div class="row">
         <!-- Table Content -->
         <div class="col-12 col-md-6 col-lg-12">
-          {% if page == 'Alumni' or page == 'Home'  %}
+          {% if page == 'Home'  %}
               <div class="card mb-2">
             <div class="card-body text-center">
                 <a href="{% url 'a-list' %}" class="btn btn-success btn-sm mr-2 mb-2"><i class="fa fa-list"> Lista Geral</i></a>
-              <a href="{% url 'a-submit' %}" class="btn btn-danger btn-sm mr-2 mb-2"><i class="fa fa-list"> Nova Submição</i></a>
+              <a href="{% url 'a-submit' %}" class="btn btn-danger btn-sm mr-2 mb-2"><i class="fa fa-list"> </i> Nova Submição | <span class="badge badge-warning rounded-pill px-3" id="notifbadge"></span> </a>
               <a href="" class="btn btn-success btn-sm mr-2 mb-2"><i class="fa fa-list"> Dados Históricos</i></a>
               <a href="{% url 'ap-list' %}" class="btn btn-info btn-sm mr-2 mb-2"><i class="fa fa-print"> Imprime Dados</i></a>
                <a href="{% url 'ap-list' %}" class="btn btn-warning btn-sm mr-2 mb-2"><i class="fa fa-table"> Sumario Geral</i></a>
@@ -115,6 +115,9 @@
                     <div class="table-responsive">
                         <table class="table table-bordered table-sm">
                             <thead style="background-color:#41d5f0;">
+                                    <tr>
+        <th colspan="6" class="text-center text-dark">Total de Dados Antigos Aluno por Faculdades</th>
+    </tr>
                                 <tr>
                                 <th rowspan="2">Nu</th>
                                 <th rowspan="2">Faculdade</th>
@@ -139,13 +142,20 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td colspan="2" class="text-centers"><center><strong><b>Total</b></strong></center></td>
-                                    <td class="text-center"><a href="">1</a></td>
-                                    <td class="text-center"><a href="">1</a></td>
-                                    <td class="text-center"><a href="">1</a></td>
+                                    <td colspan="2"  class="text-centers"><center><strong><b>Total</b></strong></center></td>
+                                    <td class="text-center"><a href="">{{totm}}</a></td>
+                                    <td class="text-center"><a href="">{{totf}}</a></td>
+                                    <td class="text-center"><a href="">{{totmf}}</a></td>
                                 </tr>
                             </tfoot>
                         </table>
+                    </div>
+                    <br>
+                    <br>
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="chartCombo" style="width:100%; height:500px;"></div>
+                        </div>
                     </div>
                     {% else %}
 
@@ -156,4 +166,10 @@
     </div> <!-- end row -->
 </div> <!-- end container -->
 
+{% endblock %}
+{% block scripts %}
+    <script src="{% static 'main/notif/badgereg.js' %}"></script>
+    <script>
+        {% include 'chart/almfm.js' %}
+    </script>
 {% endblock %}

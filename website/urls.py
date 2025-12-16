@@ -10,7 +10,7 @@ urlpatterns = [
     path('cont-carrer/<str:hashed>/', views.aluno_status, name='aluno_carrer'),
     path("ajax/pos-form/", views.ajax_pos_form, name="ajax-pos-form"),
 	path('verify/<str:hashed>/', views.alumni_verify, name='alumni_verify'),
-
+	path('list-alumni/', views.alumni_dashboard_ultra, name="alm-list"),
 
 	path('Perfil-Page.html/', views.perfil, name='al-perf'),
 

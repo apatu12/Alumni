@@ -33,6 +33,8 @@ urlpatterns = [
     path('Admin-Home.html/', main_views.home, name='index'),
     path('Login-Page.html/', main_views.loginPage, name='login'),
     path('logout-Page.html/', main_views.logout_view, name='logout'),
+    path('api/notification/', include('notif.api.urls')),
+    path('api/report/', include('report.Api.urls')),
 ]
 handler404 = 'main.views.error_404'
 handler500 = 'main.views.error_500'

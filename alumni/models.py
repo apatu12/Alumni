@@ -14,7 +14,6 @@ class ActiveManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(deleted_at__isnull=True)
 
-
 class Alumni(models.Model):
     registration_no = models.CharField(max_length=50, verbose_name="Nu Registo do Antigo Aluno/NRE", unique=True, db_index=True)
     name = models.CharField(max_length=120, verbose_name="Nome Completo")
@@ -240,6 +239,7 @@ class AlumniUser(models.Model):
     deleted_at = models.DateTimeField(null=True, blank=True)
     history = HistoricalRecords()
     hashed = models.CharField(max_length=32, null=True, blank=True)
+    
     def __str__(self):
         #template = '{0.name}'
         nk = self.alumni.name + " " + self.user

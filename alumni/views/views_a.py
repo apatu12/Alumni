@@ -29,16 +29,24 @@ def home_Alumni(request):
     group = request.user.groups.all()[0].name
     objects1, objects2 = [],[]
     fac = Faculdade.objects.all()
+    totm = 0
+    totf = 0
+    totmf = 0
+
     for data in fac:
         data1 = AcademicRecord.active_objects.filter(alumni__sex="Masculino", faculty=data).count()
         data2 = AcademicRecord.active_objects.filter(alumni__sex="Femenino", faculty=data).count()
         totalfac = data1 + data2
         objects1.append([data, data1, data2, totalfac])
+        totm += data1
+        totf += data2
+        totmf += totalfac
+
     context = {
         'page':'Home',
         'title': 'Sumario Geral Antigos ALunos',
         'legend': 'Sumario Geral Antigos ALunos',
-        'objects1':objects1,
+        'objects1':objects1,'totm':totm, 'totf':totf, 'totmf':totmf
     }
     return render(request, 'Alumni/List.html', context)
 
